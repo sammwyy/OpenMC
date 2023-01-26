@@ -13,7 +13,7 @@ labels: 'bug'
 <!-- If the following boxes are not ALL checked, your issue is likely to be closed -->
 
 - [ ] Using npm
-- [ ] Using an up-to-date [`main` branch](https://github.com/sammwyy/openmc-launcher/tree/main)
+- [ ] Using an up-to-date [`main` branch](https://github.com/sammwyy/openmc/tree/main)
 - [ ] Using latest version of devtools.
 - [ ] For issue in production release, add devtools output of `DEBUG_PROD=true npm run build && npm start`
 

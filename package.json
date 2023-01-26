@@ -1,13 +1,13 @@
 {
   "name": "openmc-launcher",
   "description": "An open source Minecraft launcher and mod manager",
-  "homepage": "https://github.com/sammwyy/openmc-launcher#readme",
+  "homepage": "https://github.com/sammwyy/openmc#readme",
   "bugs": {
-    "url": "https://github.com/sammwyy/openmc-launcher/issues"
+    "url": "https://github.com/sammwyy/openmc/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sammwyy/openmc-launcher.git"
+    "url": "git+https://github.com/sammwyy/openmc.git"
   },
   "license": "MIT",
   "author": {
