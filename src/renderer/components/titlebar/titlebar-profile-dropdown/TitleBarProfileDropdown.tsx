@@ -10,10 +10,17 @@ import {
 } from '@chakra-ui/react';
 import { BiChevronDown } from 'react-icons/bi';
 
+import styles from './TitleBarProfileDropdown.module.css';
+
 export default function TitleBarProfileDropdown() {
   return (
     <Menu>
-      <MenuButton as={Button} variant="ghost" rightIcon={<BiChevronDown />}>
+      <MenuButton
+        className={styles['menu-btn']}
+        as={Button}
+        variant="ghost"
+        rightIcon={<BiChevronDown />}
+      >
         <Flex alignItems="center">
           <Image
             borderRadius="50%"
@@ -24,7 +31,7 @@ export default function TitleBarProfileDropdown() {
           </Text>
         </Flex>
       </MenuButton>
-      <MenuList>
+      <MenuList className={styles['menu-list']}>
         <MenuItem>Download</MenuItem>
         <MenuItem>Create a Copy</MenuItem>
         <MenuItem>Mark as Draft</MenuItem>

@@ -1,14 +1,11 @@
-import { Flex, IconButton, Image, Text } from '@chakra-ui/react';
-import {
-  VscChromeClose,
-  VscChromeMaximize,
-  VscChromeMinimize,
-} from 'react-icons/vsc';
+import { Flex, Image, Text } from '@chakra-ui/react';
 
 import TitleBarSection from './titlebar-section/TitleBarSection';
+import TitleBarProfileDropdown from './titlebar-profile-dropdown/TitleBarProfileDropdown';
 
 import Icon from '../../../../assets/icon.png';
-import TitleBarProfileDropdown from './titlebar-profile-dropdown/TitleBarProfileDropdown';
+import styles from './TitleBar.module.css';
+import TitleBarButtons from './titlebar-buttons/TitleBarButtons';
 
 export interface TitleBarProps {
   title: string;
@@ -21,6 +18,7 @@ export default function TitleBar({ title }: TitleBarProps) {
       padding="10px 20px"
       alignItems="center"
       justifyContent="space-between"
+      className={styles.titlebar}
     >
       <TitleBarSection align="left">
         <TitleBarProfileDropdown />
@@ -39,19 +37,7 @@ export default function TitleBar({ title }: TitleBarProps) {
       </TitleBarSection>
 
       <TitleBarSection align="right">
-        <IconButton
-          aria-label="Minimize"
-          mr="5px"
-          icon={<VscChromeMinimize />}
-          size="xs"
-        />
-        <IconButton
-          aria-label="Maximize"
-          mr="5px"
-          icon={<VscChromeMaximize />}
-          size="xs"
-        />
-        <IconButton aria-label="Close" icon={<VscChromeClose />} size="xs" />
+        <TitleBarButtons />
       </TitleBarSection>
     </Flex>
   );

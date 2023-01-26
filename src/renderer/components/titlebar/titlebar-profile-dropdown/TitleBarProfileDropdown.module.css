@@ -1,0 +1,4 @@
+.menu-btn,
+.menu-list {
+  -webkit-app-region: no-drag;
+}
