@@ -1,4 +1,6 @@
 import {
+  Badge,
+  Box,
   Button,
   Flex,
   Image,
@@ -26,9 +28,10 @@ export default function TitleBarProfileDropdown() {
             borderRadius="50%"
             src="https://mc-heads.net/avatar/sammwy_/32"
           />
-          <Text fontSize="14px" ml="10px">
-            Sammwy_
-          </Text>
+          <Box textAlign="left" ml="10px">
+            <Text fontSize="14px">Sammwy_</Text>
+            <Badge colorScheme="green">Microsoft</Badge>
+          </Box>
         </Flex>
       </MenuButton>
       <MenuList className={styles['menu-list']}>

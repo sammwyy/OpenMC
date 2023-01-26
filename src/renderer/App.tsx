@@ -2,7 +2,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 
 import TitleBar from './components/titlebar';
-import Navbar from './components/navbar/Navbar';
+import Navbar from './components/navbar';
 
 import Main from './screens/main';
 
