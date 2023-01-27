@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'instances:list';
+export type Channels = 'instances:list' | 'icons:list';
 
 const electronHandler = {
   ipcRenderer: {
