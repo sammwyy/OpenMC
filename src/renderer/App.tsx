@@ -1,5 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import InstancesProvider from './contexts/instances/instance-provider';
 
 import TitleBar from './components/titlebar';
 import Navbar from './components/navbar';
@@ -10,15 +11,17 @@ import theme from './theme';
 
 export default function App() {
   return (
-    <ChakraProvider theme={theme}>
-      <Router>
-        <TitleBar title="OpenMC" />
-        <Navbar />
+    <InstancesProvider>
+      <ChakraProvider theme={theme}>
+        <Router>
+          <TitleBar title="OpenMC" />
+          <Navbar />
 
-        <Routes>
-          <Route path="/" element={<Main />} />
-        </Routes>
-      </Router>
-    </ChakraProvider>
+          <Routes>
+            <Route path="/" element={<Main />} />
+          </Routes>
+        </Router>
+      </ChakraProvider>
+    </InstancesProvider>
   );
 }

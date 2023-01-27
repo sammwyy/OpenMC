@@ -1,9 +1,10 @@
 import { Box, Button, Flex, Image, SimpleGrid, Text } from '@chakra-ui/react';
 import Container from 'renderer/components/container';
 import Sidebar from 'renderer/components/sidebar';
+import useInstances from 'renderer/hooks/useInstances';
 
 interface InstanceItemProps {
-  name: string;
+  name?: string;
   icon: string;
 }
 
@@ -19,6 +20,8 @@ function InstanceItem({ name, icon }: InstanceItemProps) {
 }
 
 export default function Main() {
+  const { instances } = useInstances();
+
   return (
     <Container>
       <Box width="calc(100% - 250px)" padding="0 30px">
@@ -29,14 +32,29 @@ export default function Main() {
           justifyContent="space-between"
         >
           <Text fontWeight="bold" fontSize="22px">
-            Instances (10)
+            Instances ({instances.length})
           </Text>
 
           <Button>Create</Button>
         </Flex>
 
         <SimpleGrid minChildWidth="80px" spacingX="15px" spacingY="65px">
-          <InstanceItem
+          {instances.map((instance, index) => (
+            <InstanceItem
+              key={index}
+              name={instance.name}
+              icon={instance.icon}
+            />
+          ))}
+        </SimpleGrid>
+      </Box>
+      <Sidebar />
+    </Container>
+  );
+}
+
+/*
+<InstanceItem
             name="Fabric 1.19.3"
             icon="https://avatars.githubusercontent.com/u/21025855?s=280&v=4"
           />
@@ -86,9 +104,4 @@ export default function Main() {
             name="Snapshot 23w04a"
             icon="https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/25/Warped_Nylium_JE1_BE1.png"
           />
-        </SimpleGrid>
-      </Box>
-      <Sidebar />
-    </Container>
-  );
-}
+*/
