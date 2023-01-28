@@ -131,7 +131,7 @@ export default function Sidebar({ instance }: SidebarProps) {
 
         <Flex alignItems="center" justifyContent="space-between">
           <Text fontWeight="bold">Java:</Text>
-          <Text>{version?.manifest?.javaVersion.majorVersion}</Text>
+          <Text>{version?.manifest?.javaVersion?.majorVersion || 8}</Text>
         </Flex>
 
         <Flex alignItems="center" justifyContent="space-between">

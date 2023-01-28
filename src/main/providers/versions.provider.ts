@@ -4,7 +4,11 @@ import fsSync from 'fs';
 import path from 'path';
 
 import { getSafeLauncherDir } from '../utils/dir.utils';
-import { downloadFileIfNotExist } from '../utils/file.utils';
+import {
+  downloadFileIfNotExist,
+  downloadMavenFileIfNotExist,
+  getMavenPath,
+} from '../utils/file.utils';
 
 import Version, { VersionType } from '../../common/versions/version';
 import VersionManifest, {
@@ -12,6 +16,7 @@ import VersionManifest, {
 } from '../../common/versions/version-manifest';
 import RemoteVersionManifest from '../../common/versions/remote-version-manifest';
 import Logger from '../logger';
+import { mergeVersions, normalizeVersion } from '../utils/version.utils';
 
 const WELL_KNOWN_MOD = ['labymod', 'fabric', 'forge', 'liteloader', 'optifine'];
 
@@ -54,7 +59,7 @@ async function listRemotes(): Promise<Version[]> {
   const remote = json as RemoteVersionManifest;
 
   Logger.info(
-    `Loaded ${remote.versions.length} remote versions frrom mojang servers.`
+    `Loaded ${remote.versions.length} remote versions from mojang servers.`
   );
 
   return remote.versions.map((v) => ({
@@ -95,12 +100,20 @@ export default class VersionsProvider {
 
       for (let i = 0; i < manifest.libraries.length; i += 1) {
         const lib = manifest.libraries[i];
-        const { artifact } = lib.downloads;
+        const artifact = lib.downloads?.artifact;
+
+        onFileDownloaded(lib.name);
+        Logger.info(`Downloading lib ${lib.name}.`);
+
         if (artifact) {
           const libPath = path.join(this.librariesDir, artifact.path || '');
-          onFileDownloaded(lib.name);
-          Logger.info(`Downloading lib ${lib.name}.`);
           await downloadFileIfNotExist(libPath, artifact.url);
+        } else {
+          await downloadMavenFileIfNotExist(
+            this.librariesDir,
+            lib.url || '',
+            lib.name
+          );
         }
       }
     }
@@ -124,17 +137,18 @@ export default class VersionsProvider {
 
     for (let i = 0; i < libs?.length; i += 1) {
       const lib = libs[i];
-      const { artifact } = lib.downloads;
+      const artifact = lib.downloads?.artifact;
+
+      let libPath = '';
 
       if (artifact) {
-        const libPath = path.join(
-          this.librariesDir,
-          lib.downloads.artifact.path || ''
-        );
+        libPath = path.join(this.librariesDir, artifact.path || '');
+      } else {
+        libPath = path.join(this.librariesDir, getMavenPath(lib.url || ''));
+      }
 
-        if (!fsSync.existsSync(libPath)) {
-          return false;
-        }
+      if (!fsSync.existsSync(libPath)) {
+        return false;
       }
     }
 
@@ -159,6 +173,24 @@ export default class VersionsProvider {
           });
           const manifest: VersionManifest = JSON.parse(raw);
           const version = parseVersion(manifest);
+
+          if (manifest.inheritsFrom) {
+            const parent = await this.getVersion(manifest.inheritsFrom);
+            if (parent) {
+              const merged = normalizeVersion(mergeVersions(parent, version));
+              version.manifest = merged.manifest;
+              manifest.inheritsFrom = undefined;
+
+              await fs.writeFile(
+                manifestFile,
+                JSON.stringify(version.manifest),
+                {
+                  encoding: 'utf-8',
+                }
+              );
+            }
+          }
+
           const downloaded = await this.isVersionDownloaded(version);
           version.status = downloaded ? 'ready' : 'missing';
           versions.push(version);
@@ -169,6 +201,19 @@ export default class VersionsProvider {
     Logger.info(`Loaded ${versions.length} versions from cache.`);
 
     return versions;
+  }
+
+  async getVersion(name: string): Promise<Version | null> {
+    const filePath = path.join(this.versionsDir, name, `${name}.json`);
+
+    if (fsSync.existsSync(filePath)) {
+      const raw = await fs.readFile(filePath, { encoding: 'utf-8' });
+      const json = JSON.parse(raw);
+      const manifest = json as VersionManifest;
+      return parseVersion(manifest);
+    }
+
+    return null;
   }
 
   async listVersions(): Promise<Version[]> {

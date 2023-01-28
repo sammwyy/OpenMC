@@ -41,7 +41,9 @@ export default function VersionsProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     // eslint-disable-next-line no-console
-    listVersions().then(setVersions).catch(console.error);
+    listVersions()
+      .then((v) => setVersions(v || []))
+      .catch(console.error);
   }, []);
 
   useEffect(() => {

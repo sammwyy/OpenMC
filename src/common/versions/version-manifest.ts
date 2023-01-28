@@ -26,23 +26,28 @@ export interface ManifestFile {
 }
 
 export interface ManifestLibrary {
-  downloads: {
+  downloads?: {
     artifact: ManifestFile;
   };
   name: string;
+  url?: string;
   rules?: ManifestRule[];
 }
 
 export type ManifestType = 'snapshot' | 'release' | 'old_alpha' | 'old_beta';
 
 export default interface VersionManifest {
-  arguments: ManifestArgument[];
+  arguments: {
+    game: ManifestArgument[];
+    jvm?: ManifestArgument[];
+  };
+  inheritsFrom?: string;
   assetIndex: {
     id: string;
     sha1: string;
     size: number;
     totalSize: number;
-    ulr: string;
+    url: string;
   };
   assets: string;
   downloads: {
@@ -52,7 +57,7 @@ export default interface VersionManifest {
     server_mappings?: ManifestFile;
   };
   id: string;
-  javaVersion: {
+  javaVersion?: {
     component: string;
     majorVersion: number;
   };

@@ -51,3 +51,44 @@ export async function downloadFileIfNotExist(file: string, url: string) {
     await downloadFile(file, url);
   }
 }
+
+export function getMavenPath(artifact: string) {
+  const parts = artifact.split(':');
+  const packageName = parts[0];
+  const artifactId = parts[1];
+  const version = parts[2];
+  const fileName = `${artifactId}-${version}.jar`;
+  const filePath = `${packageName.replace(
+    /\./g,
+    '/'
+  )}/${artifactId}/${version}/${fileName}`;
+  return filePath;
+}
+
+export function getMavenURL(repositoy: string, artifact: string) {
+  const filePath = getMavenPath(artifact);
+  const url = `${repositoy}${filePath}`;
+  return url;
+}
+
+export function downloadMavenFile(
+  target: string,
+  repositoy: string,
+  artifact: string
+) {
+  const filePath = getMavenPath(artifact);
+  const url = getMavenURL(repositoy, filePath);
+
+  return downloadFile(path.join(target, filePath), url);
+}
+
+export async function downloadMavenFileIfNotExist(
+  target: string,
+  repositoy: string,
+  artifact: string
+) {
+  const filePath = getMavenPath(artifact);
+  const url = getMavenURL(repositoy, filePath);
+
+  return downloadFileIfNotExist(path.join(target, filePath), url);
+}

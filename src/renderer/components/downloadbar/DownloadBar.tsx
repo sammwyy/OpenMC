@@ -14,7 +14,7 @@ export default function DownloadBar() {
       padding="10px 20px"
       bg="#444"
       color="white"
-      position="absolute"
+      position="sticky"
       bottom="0"
       left="0"
     >
