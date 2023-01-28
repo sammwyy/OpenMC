@@ -15,6 +15,7 @@ import log from 'electron-log';
 import Manager from './manager';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import Logger from './logger';
 
 class AppUpdater {
   constructor() {
@@ -72,6 +73,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     frame: false,
     webPreferences: {
+      backgroundThrottling: false,
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../env/dll/preload.js'),
@@ -81,6 +83,8 @@ const createWindow = async () => {
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
+    Logger.registerWebContents(mainWindow?.webContents);
+
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }

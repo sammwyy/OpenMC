@@ -1,6 +1,7 @@
 import Instance from 'common/instances/instance';
 import Version from 'common/versions/version';
 import { IpcMain } from 'electron';
+import Logger from './logger';
 import IconsProvider from './providers/icons.provider';
 import InstanceProvider from './providers/instance.provider';
 import LauncherProvider from './providers/launcher.provider';
@@ -21,35 +22,51 @@ export default class Manager {
 
   registerIPC(ipc: IpcMain) {
     ipc.on('icons:list', async (event) => {
-      const icons = await this.icons.listIcons();
+      Logger.debug(`Renderer call IPC function "icons:list"`);
+      const icons = await this.icons
+        .listIcons()
+        .catch((e) => Logger.crit(e.toString()));
       event.sender.send('icons:list', icons);
     });
 
     ipc.on('instances:create', async (event, args) => {
+      Logger.debug(`Renderer call IPC function "instances:create"`);
       const instance = args[0] as Instance;
-      const savedInstance = await this.instances.createInstance(instance);
+      const savedInstance = await this.instances
+        .createInstance(instance)
+        .catch((e) => Logger.crit(e.toString()));
       event.sender.send('instances:create', savedInstance);
     });
 
     ipc.on('instances:get_metadata', async (event, args) => {
+      Logger.debug(`Renderer call IPC function "instances:get_metadata"`);
       const name = args[0] as string;
-      const metadata = await this.instances.getInstanceMetadata(name);
+      const metadata = await this.instances
+        .getInstanceMetadata(name)
+        .catch((e) => Logger.crit(e.toString()));
       event.sender.send('instances:get_metadata', metadata);
     });
 
     ipc.on('instances:list', async (event) => {
-      const instances = await this.instances.listInstances();
+      Logger.debug(`Renderer call IPC function "instances:list"`);
+      const instances = await this.instances
+        .listInstances()
+        .catch((e) => Logger.crit(e.toString()));
       event.sender.send('instances:list', instances);
     });
 
     ipc.on('launcher:launch', async (event, args) => {
+      Logger.debug(`Renderer call IPC function "launcher:launch"`);
       const instance = args[0] as Instance;
       const version = args[1] as Version;
-      await this.launcher.launch(instance, version);
+      await this.launcher
+        .launch(instance, version)
+        .catch((e) => Logger.crit(e.toString()));
       event.sender.send('launcher:launch', []);
     });
 
     ipc.on('versions:download', async (event, args) => {
+      Logger.debug(`Renderer call IPC function "versions:download"`);
       const version = args[0] as Version;
 
       function onStart() {
@@ -68,17 +85,25 @@ export default class Manager {
         }
       }
 
-      this.versions.downloadVersion(version, onStart, onDownloadFile, onEnd);
+      this.versions
+        .downloadVersion(version, onStart, onDownloadFile, onEnd)
+        .catch((e) => Logger.crit(e.toString()));
     });
 
     ipc.on('versions:download_manifest', async (event, args) => {
+      Logger.debug(`Renderer call IPC function "versions:download_manifest"`);
       const url = args[0] as string;
-      const version = await this.versions.downloadManifest(url);
-      event.sender.send('versions:download_manifest', version.manifest);
+      const version = await this.versions
+        .downloadManifest(url)
+        .catch((e) => Logger.crit(e.toString()));
+      event.sender.send('versions:download_manifest', version?.manifest);
     });
 
     ipc.on('versions:list', async (event) => {
-      const versions = await this.versions.listVersions();
+      Logger.debug(`Renderer call IPC function "versions:list"`);
+      const versions = await this.versions
+        .listVersions()
+        .catch((e) => Logger.crit(e.toString()));
       event.sender.send('versions:list', versions);
     });
   }

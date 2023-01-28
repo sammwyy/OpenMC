@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import Logger from '../logger';
 import { getSafeLauncherDir } from '../utils/dir.utils';
 import { imageToBase64 } from '../utils/file.utils';
 
@@ -27,6 +28,7 @@ export default class IconsProvider {
       }
     }
 
+    Logger.debug(`Loaded ${icons.length} icons.`);
     return icons;
   }
 }

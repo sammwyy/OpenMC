@@ -7,6 +7,7 @@ import InstanceSettings from '../../common/instances/instance-settings';
 import InstanceMetadata from '../../common/instances/instance-metadata';
 import { getSafeLauncherDir } from '../utils/dir.utils';
 import { imageToBase64 } from '../utils/file.utils';
+import Logger from '../logger';
 
 async function loadInstance(instanceDir: string): Promise<Instance> {
   // Get name.
@@ -48,6 +49,9 @@ export default class InstanceProvider {
     const b64data = instance.icon.replace(/^data:image\/png;base64,/, '');
     await fs.writeFile(iconFile, b64data, { encoding: 'base64' });
 
+    Logger.debug(
+      `New instance saved: name=${instance.name},manifest=${instance.settings.manifest}`
+    );
     return instance;
   }
 

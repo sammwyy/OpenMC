@@ -11,6 +11,7 @@ import VersionManifest, {
   ManifestType,
 } from '../../common/versions/version-manifest';
 import RemoteVersionManifest from '../../common/versions/remote-version-manifest';
+import Logger from '../logger';
 
 const WELL_KNOWN_MOD = ['labymod', 'fabric', 'forge', 'liteloader', 'optifine'];
 
@@ -52,6 +53,10 @@ async function listRemotes(): Promise<Version[]> {
   const json = await req.json();
   const remote = json as RemoteVersionManifest;
 
+  Logger.info(
+    `Loaded ${remote.versions.length} remote versions frrom mojang servers.`
+  );
+
   return remote.versions.map((v) => ({
     name: v.id,
     time: v.releaseTime,
@@ -77,6 +82,7 @@ export default class VersionsProvider {
     onDownloadEnd: (error: boolean) => void
   ) {
     onDownloadStart();
+    Logger.info(`Started download for version: ${version.name}.`);
 
     const { manifest } = version;
     if (manifest) {
@@ -90,12 +96,16 @@ export default class VersionsProvider {
       for (let i = 0; i < manifest.libraries.length; i += 1) {
         const lib = manifest.libraries[i];
         const { artifact } = lib.downloads;
-        const libPath = path.join(this.librariesDir, artifact.path || '');
-        onFileDownloaded(lib.name);
-        await downloadFileIfNotExist(libPath, artifact.url);
+        if (artifact) {
+          const libPath = path.join(this.librariesDir, artifact.path || '');
+          onFileDownloaded(lib.name);
+          Logger.info(`Downloading lib ${lib.name}.`);
+          await downloadFileIfNotExist(libPath, artifact.url);
+        }
       }
     }
 
+    Logger.info(`Finished download for version: ${version.name}.`);
     onDownloadEnd(false);
   }
 
@@ -114,13 +124,17 @@ export default class VersionsProvider {
 
     for (let i = 0; i < libs?.length; i += 1) {
       const lib = libs[i];
-      const libPath = path.join(
-        this.librariesDir,
-        lib.downloads.artifact.path || ''
-      );
+      const { artifact } = lib.downloads;
 
-      if (!fsSync.existsSync(libPath)) {
-        return false;
+      if (artifact) {
+        const libPath = path.join(
+          this.librariesDir,
+          lib.downloads.artifact.path || ''
+        );
+
+        if (!fsSync.existsSync(libPath)) {
+          return false;
+        }
       }
     }
 
@@ -151,6 +165,9 @@ export default class VersionsProvider {
         }
       }
     }
+
+    Logger.info(`Loaded ${versions.length} versions from cache.`);
+
     return versions;
   }
 
@@ -187,6 +204,7 @@ export default class VersionsProvider {
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(jsonFile, JSON.stringify(json));
 
+    Logger.info(`Downloaded version manifest for ${manifest.id}.`);
     return version;
   }
 }
