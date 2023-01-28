@@ -1,3 +1,4 @@
+import { createCookieStorageManager } from '@chakra-ui/color-mode';
 import { ChakraProvider } from '@chakra-ui/react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import LogsProvider from './contexts/logging/logs-provider';
@@ -21,11 +22,15 @@ import './styles/scroll.css';
 import Logs from './screens/logs';
 
 export default function App() {
+  const manager = createCookieStorageManager(
+    'color-mode',
+    `${theme.config.initialColorMode}`
+  );
   return (
     <LogsProvider>
       <InstancesProvider>
         <VersionsProvider>
-          <ChakraProvider theme={theme}>
+          <ChakraProvider theme={theme} colorModeManager={manager}>
             <Router>
               <TitleBar title="OpenMC" />
               <Navbar />
