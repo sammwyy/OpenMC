@@ -41,8 +41,11 @@ export default function Sidebar({ instance }: SidebarProps) {
       </Text>
 
       <Box mt="25px">
-        <Button width="100%" colorScheme="green">
-          Run instance
+        <Button
+          width="100%"
+          colorScheme={version?.downloaded ? 'green' : 'cyan'}
+        >
+          {version?.downloaded ? 'Run instance' : 'Download'}
         </Button>
         <Flex mt="10px" justifyContent="space-between">
           <IconButton aria-label="Edit instance" icon={<FiEdit />} isDisabled />

@@ -8,4 +8,5 @@ export default interface Version {
   type: VersionType;
   manifest?: VersionManifest;
   manifestUrl?: string;
+  downloaded: boolean;
 }

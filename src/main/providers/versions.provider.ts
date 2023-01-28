@@ -41,7 +41,7 @@ function parseVersion(manifest: VersionManifest): Version {
   const name = manifest.id;
   const time = manifest.releaseTime;
   const type = parseManifestType(name, manifest.type);
-  return { name, manifest, time, type };
+  return { name, manifest, time, type, downloaded: false };
 }
 
 async function listRemotes(): Promise<Version[]> {
@@ -56,14 +56,45 @@ async function listRemotes(): Promise<Version[]> {
     time: v.releaseTime,
     type: parseManifestType(v.id, v.type),
     manifestUrl: v.url,
+    downloaded: false,
   }));
 }
 
 export default class VersionsProvider {
+  private librariesDir: string;
   private versionsDir: string;
 
   constructor() {
+    this.librariesDir = getSafeLauncherDir('libraries');
     this.versionsDir = getSafeLauncherDir('versions');
+  }
+
+  async isVersionDownloaded(version: Version) {
+    const jarFile = path.join(
+      this.versionsDir,
+      version.name,
+      `${version.name}.jar`
+    );
+
+    if (!fsSync.existsSync(jarFile) || !version.manifest) {
+      return false;
+    }
+
+    const libs = version.manifest.libraries;
+
+    for (let i = 0; i < libs?.length; i += 1) {
+      const lib = libs[i];
+      const libPath = path.join(
+        this.librariesDir,
+        lib.downloads.artifact.path || ''
+      );
+
+      if (!fsSync.existsSync(libPath)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   async listLocals(): Promise<Version[]> {
@@ -83,7 +114,10 @@ export default class VersionsProvider {
             encoding: 'utf-8',
           });
           const manifest: VersionManifest = JSON.parse(raw);
-          versions.push(parseVersion(manifest));
+          const version = parseVersion(manifest);
+          const downloaded = await this.isVersionDownloaded(version);
+          version.downloaded = downloaded;
+          versions.push(version);
         }
       }
     }
