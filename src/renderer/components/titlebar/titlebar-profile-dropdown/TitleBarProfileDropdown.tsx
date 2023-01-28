@@ -6,6 +6,7 @@ import {
   Image,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Text,
@@ -26,20 +27,22 @@ export default function TitleBarProfileDropdown() {
         <Flex alignItems="center">
           <Image
             borderRadius="50%"
-            src="https://mc-heads.net/avatar/sammwy_/32"
+            src="https://mc-heads.net/avatar/steve/32"
           />
           <Box textAlign="left" ml="10px">
-            <Text fontSize="14px">Sammwy_</Text>
-            <Badge colorScheme="green">Microsoft</Badge>
+            <Text fontSize="14px">Player</Text>
+            <Badge colorScheme="red">Offline</Badge>
           </Box>
         </Flex>
       </MenuButton>
-      <MenuList className={styles['menu-list']}>
-        <MenuItem>Download</MenuItem>
-        <MenuItem>Create a Copy</MenuItem>
-        <MenuItem>Mark as Draft</MenuItem>
-        <MenuItem>Delete</MenuItem>
-        <MenuItem>Attend a Workshop</MenuItem>
+      <MenuList className={styles['menu-list']} bg="#111">
+        <MenuDivider />
+        <MenuItem bg="transparent" isDisabled>
+          Add account
+        </MenuItem>
+        <MenuItem bg="transparent" isDisabled color="red.400">
+          Logout
+        </MenuItem>
       </MenuList>
     </Menu>
   );
