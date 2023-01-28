@@ -4,14 +4,21 @@ import LogsContext from './logs-context';
 
 export default function LogsProvider({ children }: PropsWithChildren) {
   const [entries, setEntries] = useState<LogEntry[]>([]);
+  const [logValue, setLog] = useState<LogEntry | null>(null);
+
+  useEffect(() => {
+    if (logValue) {
+      setEntries([...entries, logValue]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logValue]);
 
   function log(level: LogLevel, message: string) {
-    entries.push({
+    setLog({
       date: new Date(Date.now()).toLocaleTimeString(),
       message,
       level,
     });
-    setEntries(entries);
   }
 
   function crit(message: string) {
