@@ -6,6 +6,7 @@ import VersionsProvider from './contexts/versions/versions-provider';
 // Components
 import TitleBar from './components/titlebar';
 import Navbar from './components/navbar';
+import DownloadBar from './components/downloadbar';
 
 // Pages
 import Main from './screens/main';
@@ -32,6 +33,8 @@ export default function App() {
               <Route path="/instances" element={<Instances />} />
               <Route path="/instances/create" element={<CreateInstance />} />
             </Routes>
+
+            <DownloadBar />
           </Router>
         </ChakraProvider>
       </VersionsProvider>

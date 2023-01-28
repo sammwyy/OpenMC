@@ -4,6 +4,7 @@ import Version, { VersionType } from '../../../common/versions/version';
 
 const VersionsContext = React.createContext<VersionsHook>({
   versions: <Version[]>[],
+  lastFile: null,
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   downloadManifest: (version: Version): Promise<Version> => {

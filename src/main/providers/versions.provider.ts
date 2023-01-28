@@ -4,6 +4,7 @@ import fsSync from 'fs';
 import path from 'path';
 
 import { getSafeLauncherDir } from '../utils/dir.utils';
+import { downloadFileIfNotExist } from '../utils/file.utils';
 
 import Version, { VersionType } from '../../common/versions/version';
 import VersionManifest, {
@@ -41,7 +42,7 @@ function parseVersion(manifest: VersionManifest): Version {
   const name = manifest.id;
   const time = manifest.releaseTime;
   const type = parseManifestType(name, manifest.type);
-  return { name, manifest, time, type, downloaded: false };
+  return { name, manifest, time, type, status: 'missing' };
 }
 
 async function listRemotes(): Promise<Version[]> {
@@ -56,7 +57,7 @@ async function listRemotes(): Promise<Version[]> {
     time: v.releaseTime,
     type: parseManifestType(v.id, v.type),
     manifestUrl: v.url,
-    downloaded: false,
+    status: 'missing',
   }));
 }
 
@@ -67,6 +68,35 @@ export default class VersionsProvider {
   constructor() {
     this.librariesDir = getSafeLauncherDir('libraries');
     this.versionsDir = getSafeLauncherDir('versions');
+  }
+
+  async downloadVersion(
+    version: Version,
+    onDownloadStart: () => void,
+    onFileDownloaded: (file: string) => void,
+    onDownloadEnd: (error: boolean) => void
+  ) {
+    onDownloadStart();
+
+    const { manifest } = version;
+    if (manifest) {
+      const jarFile = path.join(
+        this.versionsDir,
+        version.name,
+        `${version.name}.jar`
+      );
+      downloadFileIfNotExist(jarFile, manifest.downloads.client.url);
+
+      for (let i = 0; i < manifest.libraries.length; i += 1) {
+        const lib = manifest.libraries[i];
+        const { artifact } = lib.downloads;
+        const libPath = path.join(this.librariesDir, artifact.path || '');
+        onFileDownloaded(lib.name);
+        await downloadFileIfNotExist(libPath, manifest.downloads.client.url);
+      }
+    }
+
+    onDownloadEnd(false);
   }
 
   async isVersionDownloaded(version: Version) {
@@ -116,7 +146,7 @@ export default class VersionsProvider {
           const manifest: VersionManifest = JSON.parse(raw);
           const version = parseVersion(manifest);
           const downloaded = await this.isVersionDownloaded(version);
-          version.downloaded = downloaded;
+          version.status = downloaded ? 'ready' : 'missing';
           versions.push(version);
         }
       }

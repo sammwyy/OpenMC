@@ -31,6 +31,10 @@ export async function imageToBase64(file: string) {
 export function downloadFile(file: string, url: string) {
   return new Promise((resolve, reject) => {
     async function fetchAsync() {
+      const dir = path.join(file, '..');
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(file, '');
+
       const res = await fetch(url);
       const fileStream = fsSync.createWriteStream(file);
       res.body.pipe(fileStream);
@@ -40,4 +44,10 @@ export function downloadFile(file: string, url: string) {
 
     fetchAsync();
   });
+}
+
+export async function downloadFileIfNotExist(file: string, url: string) {
+  if (!fsSync.existsSync(file)) {
+    await downloadFile(file, url);
+  }
 }

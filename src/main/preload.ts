@@ -5,6 +5,7 @@ export type Channels =
   | 'instances:create'
   | 'instances:get_metadata'
   | 'instances:list'
+  | 'versions:download'
   | 'versions:download_manifest'
   | 'versions:list';
 

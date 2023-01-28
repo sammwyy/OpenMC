@@ -5,6 +5,7 @@ import InstanceMetadata from 'common/instances/instance-metadata';
 import { FiCopy, FiEdit, FiFolder, FiTrash2 } from 'react-icons/fi';
 import useInstances from 'renderer/hooks/useInstances';
 import useVersions from 'renderer/hooks/useVersions';
+import { downloadVersion } from 'renderer/services/versions.service';
 
 interface SidebarProps {
   instance: Instance | undefined;
@@ -32,6 +33,44 @@ export default function Sidebar({ instance }: SidebarProps) {
     return <div> </div>;
   }
 
+  function statusToColor() {
+    switch (version?.status) {
+      case 'downloading':
+        return 'yellow';
+      case 'missing':
+        return 'cyan';
+      case 'ready':
+        return 'green';
+      default:
+        return 'gray';
+    }
+  }
+
+  function statusToText() {
+    switch (version?.status) {
+      case 'downloading':
+        return 'Downloading...';
+      case 'missing':
+        return 'Download';
+      case 'ready':
+        return 'Launch';
+      default:
+        return 'Loading';
+    }
+  }
+
+  function canRunAction() {
+    return version?.status === 'missing' || version?.status === 'ready';
+  }
+
+  function runAction() {
+    if (version?.status === 'missing') {
+      downloadVersion(version);
+    } else if (version?.status === 'ready') {
+      alert('uwu');
+    }
+  }
+
   return (
     <Box height="100%" width="250px" bg="#1A1A1A" padding="25px">
       <Image margin="auto" width="75%" src={instance?.icon} />
@@ -43,9 +82,11 @@ export default function Sidebar({ instance }: SidebarProps) {
       <Box mt="25px">
         <Button
           width="100%"
-          colorScheme={version?.downloaded ? 'green' : 'cyan'}
+          colorScheme={statusToColor()}
+          isDisabled={!canRunAction()}
+          onClick={() => runAction()}
         >
-          {version?.downloaded ? 'Run instance' : 'Download'}
+          {statusToText()}
         </Button>
         <Flex mt="10px" justifyContent="space-between">
           <IconButton aria-label="Edit instance" icon={<FiEdit />} isDisabled />

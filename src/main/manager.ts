@@ -1,4 +1,5 @@
 import Instance from 'common/instances/instance';
+import Version from 'common/versions/version';
 import { IpcMain } from 'electron';
 import IconsProvider from './providers/icons.provider';
 import InstanceProvider from './providers/instance.provider';
@@ -36,6 +37,28 @@ export default class Manager {
     ipc.on('instances:list', async (event) => {
       const instances = await this.instances.listInstances();
       event.sender.send('instances:list', instances);
+    });
+
+    ipc.on('versions:download', async (event, args) => {
+      const version = args[0] as Version;
+
+      function onStart() {
+        event.sender.send('versions:download', ['start', version.name]);
+      }
+
+      function onDownloadFile(file: string) {
+        event.sender.send('versions:download', ['file', version.name, file]);
+      }
+
+      function onEnd(error: boolean) {
+        if (error) {
+          event.sender.send('versions:download', ['error', version.name]);
+        } else {
+          event.sender.send('versions:download', ['end', version.name]);
+        }
+      }
+
+      this.versions.downloadVersion(version, onStart, onDownloadFile, onEnd);
     });
 
     ipc.on('versions:download_manifest', async (event, args) => {

@@ -24,3 +24,7 @@ export function downloadManifestWithUrl(url: string): Promise<VersionManifest> {
     ]);
   });
 }
+
+export function downloadVersion(version: Version) {
+  window.electron.ipcRenderer.sendMessage('versions:download', [version]);
+}
