@@ -12,6 +12,9 @@ const InstancesContext = React.createContext<InstanceHook>({
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateInstance: (instance: Instance): void => {},
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   removeInstance: (instance: Instance): void => {},
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

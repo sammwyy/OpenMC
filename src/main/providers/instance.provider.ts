@@ -25,6 +25,7 @@ async function loadInstance(instanceDir: string): Promise<Instance> {
     name,
     icon,
     settings,
+    launching: false,
   };
 }
 

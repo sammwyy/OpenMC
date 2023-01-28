@@ -11,6 +11,10 @@ import InstancesContext from './instances-context';
 export default function InstancesProvider({ children }: PropsWithChildren) {
   const [instances, setInstances] = useState<Instance[]>([]);
 
+  function updateInstance(instance: Instance) {
+    setInstances([...instances.filter((v) => v !== instance), instance]);
+  }
+
   async function addInstance(instance: Instance) {
     instances.push(instance);
     const newInstance = await createInstance(instance);
@@ -43,6 +47,7 @@ export default function InstancesProvider({ children }: PropsWithChildren) {
       value={{
         instances,
         addInstance,
+        updateInstance,
         removeInstance,
         getInstanceByName,
         getInstanceMetadata,

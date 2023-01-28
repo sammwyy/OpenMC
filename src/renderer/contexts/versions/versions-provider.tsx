@@ -11,11 +11,6 @@ export default function VersionsProvider({ children }: PropsWithChildren) {
   const [versions, setVersions] = useState<Version[]>([]);
   const [lastFile, setLastFile] = useState<string | null>(null);
 
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    listVersions().then(setVersions).catch(console.error);
-  }, []);
-
   function updateVersion(version: Version) {
     setVersions([...versions.filter((v) => v !== version), version]);
   }
@@ -45,13 +40,12 @@ export default function VersionsProvider({ children }: PropsWithChildren) {
   }
 
   useEffect(() => {
-    window.electron.ipcRenderer.on('versions:download', (_args) => {
-      const args = _args as unknown as string[];
+    // eslint-disable-next-line no-console
+    listVersions().then(setVersions).catch(console.error);
+  }, []);
 
-      const status = args[0] as string;
-      const name = args[1] as string;
-      const file = args[2] as string;
-
+  useEffect(() => {
+    function downloadVersion(status: string, name: string, file: string) {
       const version = getByName(name);
 
       if (!version) {
@@ -72,9 +66,21 @@ export default function VersionsProvider({ children }: PropsWithChildren) {
       }
 
       updateVersion(version);
-    });
+    }
+
+    if (versions.length > 0) {
+      window.electron.ipcRenderer.on('versions:download', (_args) => {
+        const args = _args as unknown as string[];
+
+        const status = args[0] as string;
+        const name = args[1] as string;
+        const file = args[2] as string;
+
+        downloadVersion(status, name, file);
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [versions]);
 
   return (
     <VersionsContext.Provider

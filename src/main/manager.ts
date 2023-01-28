@@ -3,16 +3,19 @@ import Version from 'common/versions/version';
 import { IpcMain } from 'electron';
 import IconsProvider from './providers/icons.provider';
 import InstanceProvider from './providers/instance.provider';
+import LauncherProvider from './providers/launcher.provider';
 import VersionsProvider from './providers/versions.provider';
 
 export default class Manager {
   private readonly icons: IconsProvider;
   private readonly instances: InstanceProvider;
+  private readonly launcher: LauncherProvider;
   private readonly versions: VersionsProvider;
 
   constructor() {
     this.icons = new IconsProvider();
     this.instances = new InstanceProvider();
+    this.launcher = new LauncherProvider();
     this.versions = new VersionsProvider();
   }
 
@@ -37,6 +40,13 @@ export default class Manager {
     ipc.on('instances:list', async (event) => {
       const instances = await this.instances.listInstances();
       event.sender.send('instances:list', instances);
+    });
+
+    ipc.on('launcher:launch', async (event, args) => {
+      const instance = args[0] as Instance;
+      const version = args[1] as Version;
+      await this.launcher.launch(instance, version);
+      event.sender.send('launcher:launch', []);
     });
 
     ipc.on('versions:download', async (event, args) => {

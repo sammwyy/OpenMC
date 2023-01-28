@@ -196,6 +196,7 @@ export default function CreateInstance() {
       settings: {
         manifest: mcVersion.name,
       },
+      launching: false,
     };
 
     await addInstance(instance);

@@ -6,13 +6,14 @@ import { FiCopy, FiEdit, FiFolder, FiTrash2 } from 'react-icons/fi';
 import useInstances from 'renderer/hooks/useInstances';
 import useVersions from 'renderer/hooks/useVersions';
 import { downloadVersion } from 'renderer/services/versions.service';
+import { launchInstance } from 'renderer/services/launcher.service';
 
 interface SidebarProps {
   instance: Instance | undefined;
 }
 
 export default function Sidebar({ instance }: SidebarProps) {
-  const { getInstanceMetadata } = useInstances();
+  const { getInstanceMetadata, updateInstance } = useInstances();
   const { getByName } = useVersions();
 
   const [metadata, setMetadata] = useState<InstanceMetadata | null>(null);
@@ -34,6 +35,10 @@ export default function Sidebar({ instance }: SidebarProps) {
   }
 
   function statusToColor() {
+    if (instance?.launching) {
+      return 'red';
+    }
+
     switch (version?.status) {
       case 'downloading':
         return 'yellow';
@@ -47,6 +52,10 @@ export default function Sidebar({ instance }: SidebarProps) {
   }
 
   function statusToText() {
+    if (instance?.launching) {
+      return 'Launching...';
+    }
+
     switch (version?.status) {
       case 'downloading':
         return 'Downloading...';
@@ -60,14 +69,19 @@ export default function Sidebar({ instance }: SidebarProps) {
   }
 
   function canRunAction() {
+    if (instance?.launching) return false;
     return version?.status === 'missing' || version?.status === 'ready';
   }
 
-  function runAction() {
+  async function runAction() {
     if (version?.status === 'missing') {
       downloadVersion(version);
-    } else if (version?.status === 'ready') {
-      alert('uwu');
+    } else if (version?.status === 'ready' && instance?.launching === false) {
+      instance.launching = true;
+      updateInstance(instance);
+      await launchInstance(instance, version);
+      instance.launching = false;
+      updateInstance(instance);
     }
   }
 

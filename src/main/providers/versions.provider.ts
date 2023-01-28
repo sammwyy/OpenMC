@@ -92,7 +92,7 @@ export default class VersionsProvider {
         const { artifact } = lib.downloads;
         const libPath = path.join(this.librariesDir, artifact.path || '');
         onFileDownloaded(lib.name);
-        await downloadFileIfNotExist(libPath, manifest.downloads.client.url);
+        await downloadFileIfNotExist(libPath, artifact.url);
       }
     }
 
