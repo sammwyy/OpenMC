@@ -11,4 +11,13 @@ export function listInstances(): Promise<Instance[]> {
   });
 }
 
-export function saveInstance() {}
+export function createInstance(instance: Instance): Promise<Instance> {
+  return new Promise((resolve) => {
+    window.electron.ipcRenderer.once('instances:create', (packet) => {
+      const result = packet as Instance;
+      resolve(result);
+    });
+
+    window.electron.ipcRenderer.sendMessage('instances:create', [instance]);
+  });
+}

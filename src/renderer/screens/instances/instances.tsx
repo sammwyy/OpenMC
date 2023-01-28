@@ -49,6 +49,14 @@ export default function Instances() {
               icon={instance.icon}
             />
           ))}
+
+          <div> </div>
+          <div> </div>
+          <div> </div>
+          <div> </div>
+          <div> </div>
+          <div> </div>
+          <div> </div>
         </SimpleGrid>
       </Box>
       <Sidebar />

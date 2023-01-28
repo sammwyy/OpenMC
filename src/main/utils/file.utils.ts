@@ -1,5 +1,7 @@
 /* eslint-disable no-await-in-loop */
+import fetch from 'node-fetch';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 
 export async function deleteRecursive(dir: string) {
@@ -8,9 +10,9 @@ export async function deleteRecursive(dir: string) {
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
     const filePath = path.join(dir, file);
-    const { isDirectory } = await fs.stat(filePath);
+    const stats = await fs.stat(filePath);
 
-    if (isDirectory()) {
+    if (stats.isDirectory()) {
       await deleteRecursive(filePath);
     } else {
       await fs.unlink(filePath);
@@ -24,4 +26,18 @@ export async function imageToBase64(file: string) {
   const bitmap = await fs.readFile(file);
   const b64 = Buffer.alloc(bitmap.length, bitmap).toString('base64');
   return `data:image/png;base64,${b64}`;
+}
+
+export function downloadFile(file: string, url: string) {
+  return new Promise((resolve, reject) => {
+    async function fetchAsync() {
+      const res = await fetch(url);
+      const fileStream = fsSync.createWriteStream(file);
+      res.body.pipe(fileStream);
+      res.body.on('error', reject);
+      fileStream.on('finish', resolve);
+    }
+
+    fetchAsync();
+  });
 }

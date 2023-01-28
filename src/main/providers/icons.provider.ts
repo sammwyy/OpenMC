@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { getSafeLauncherFile } from '../utils/dir.utils';
+import { getSafeLauncherDir } from '../utils/dir.utils';
 import { imageToBase64 } from '../utils/file.utils';
 
 const FILES_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.ico'];
@@ -10,7 +10,7 @@ export default class IconsProvider {
   private iconsDir: string;
 
   constructor() {
-    this.iconsDir = getSafeLauncherFile('icons');
+    this.iconsDir = getSafeLauncherDir('icons');
   }
 
   async listIcons() {

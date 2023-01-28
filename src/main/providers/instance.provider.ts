@@ -4,7 +4,7 @@ import path from 'path';
 
 import Instance from '../../common/instances/instance';
 import InstanceSettings from '../../common/instances/instance-settings';
-import { getSafeLauncherFile } from '../utils/dir.utils';
+import { getSafeLauncherDir } from '../utils/dir.utils';
 import { imageToBase64 } from '../utils/file.utils';
 
 async function loadInstance(instanceDir: string): Promise<Instance> {
@@ -31,7 +31,20 @@ export default class InstanceProvider {
   private instancesDir: string;
 
   constructor() {
-    this.instancesDir = getSafeLauncherFile('instances');
+    this.instancesDir = getSafeLauncherDir('instances');
+  }
+
+  async createInstance(instance: Instance) {
+    const dir = path.join(this.instancesDir, instance.name);
+    await fs.mkdir(dir, { recursive: true });
+
+    const configFile = path.join(dir, 'instance.json');
+    const rawConfig = JSON.stringify(instance.settings);
+    await fs.writeFile(configFile, rawConfig, { encoding: 'utf-8' });
+
+    const iconFile = path.join(dir, 'icon.png');
+    const b64data = instance.icon.replace(/^data:image\/png;base64,/, '');
+    await fs.writeFile(iconFile, b64data, { encoding: 'base64' });
   }
 
   async listInstances() {

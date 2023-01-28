@@ -9,14 +9,17 @@ interface StepItem {
 }
 
 interface StepsProps {
+  disabled: boolean;
   steps: StepItem[];
+  onFinish: () => void;
 }
 
-export default function Steps({ steps }: StepsProps) {
+export default function Steps({ disabled, steps, onFinish }: StepsProps) {
   const { nextStep, prevStep, activeStep } = useSteps({
     initialStep: 0,
   });
   const currentStep = steps[activeStep];
+  const isLast = activeStep === steps.length - 1;
 
   return (
     <Flex flexDir="column" width="100%">
@@ -42,10 +45,10 @@ export default function Steps({ steps }: StepsProps) {
         </Button>
         <Button
           size="sm"
-          onClick={nextStep}
-          isDisabled={currentStep.requiredValue === ''}
+          onClick={isLast ? onFinish : nextStep}
+          isDisabled={disabled || currentStep?.requiredValue === ''}
         >
-          {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+          {isLast ? 'Finish' : 'Next'}
         </Button>
       </Flex>
     </Flex>
