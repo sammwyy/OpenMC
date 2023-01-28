@@ -4,8 +4,8 @@ import { StepsTheme as Steps } from 'chakra-ui-steps';
 
 const theme = extendTheme({
   config: {
-    initialColorMode: 'light',
-    useSystemColorMode: true,
+    initialColorMode: 'dark',
+    useSystemColorMode: false,
   },
   components: {
     Steps,

@@ -177,8 +177,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "orgenv.ElectronReact",
+    "productName": "OpenMC",
+    "appId": "com.sammwy.OpenMC",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
