@@ -28,6 +28,22 @@ let mainWindow: BrowserWindow | null = null;
 const manager = new Manager();
 manager.registerIPC(ipcMain);
 
+ipcMain.on('window:close', () => {
+  mainWindow?.close();
+});
+
+ipcMain.on('window:minimize', () => {
+  mainWindow?.minimize();
+});
+
+ipcMain.on('window:maximize', () => {
+  if (mainWindow?.isMaximized()) {
+    mainWindow.restore();
+  } else {
+    mainWindow?.maximize();
+  }
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

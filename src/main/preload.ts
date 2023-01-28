@@ -8,7 +8,10 @@ export type Channels =
   | 'launcher:launch'
   | 'versions:download'
   | 'versions:download_manifest'
-  | 'versions:list';
+  | 'versions:list'
+  | 'window:close'
+  | 'window:minimize'
+  | 'window:maximize';
 
 const electronHandler = {
   ipcRenderer: {
