@@ -1,3 +1,4 @@
+import InstanceMetadata from 'common/instances/instance-metadata';
 import React from 'react';
 import Instance from '../../../common/instances/instance';
 import InstanceHook from './instance-hook';
@@ -16,6 +17,11 @@ const InstancesContext = React.createContext<InstanceHook>({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getInstanceByName: (name: string): Instance | null => {
     return null;
+  },
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getInstanceMetadata: (name: string): Promise<InstanceMetadata | null> => {
+    return new Promise(() => {});
   },
 });
 

@@ -1,6 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
 import {
   createInstance,
+  getInstanceMetadata,
   listInstances,
 } from 'renderer/services/instance.service';
 
@@ -44,6 +45,7 @@ export default function InstancesProvider({ children }: PropsWithChildren) {
         addInstance,
         removeInstance,
         getInstanceByName,
+        getInstanceMetadata,
       }}
     >
       {children}

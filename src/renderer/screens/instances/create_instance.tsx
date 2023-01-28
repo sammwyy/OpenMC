@@ -17,6 +17,7 @@ import {
 import Instance from 'common/instances/instance';
 import Version from 'common/versions/version';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Container from 'renderer/components/container';
 import Steps from 'renderer/components/steps';
 import useInstances from 'renderer/hooks/useInstances';
@@ -171,6 +172,7 @@ function Step3Version({ value, setValue }: StateProps) {
 export default function CreateInstance() {
   const { addInstance } = useInstances();
   const { getByName } = useVersions();
+  const navigate = useNavigate();
 
   const [icon, setIcon] = useState('');
   const [name, setName] = useState('');
@@ -205,8 +207,9 @@ export default function CreateInstance() {
       <Flex margin="auto" width="500px">
         <Steps
           disabled={saving}
-          onFinish={() => {
-            saveInstance();
+          onFinish={async () => {
+            await saveInstance();
+            navigate('/instances');
           }}
           steps={[
             {

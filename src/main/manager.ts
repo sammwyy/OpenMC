@@ -23,7 +23,14 @@ export default class Manager {
 
     ipc.on('instances:create', async (event, args) => {
       const instance = args[0] as Instance;
-      await this.instances.createInstance(instance);
+      const savedInstance = await this.instances.createInstance(instance);
+      event.sender.send('instances:create', savedInstance);
+    });
+
+    ipc.on('instances:get_metadata', async (event, args) => {
+      const name = args[0] as string;
+      const metadata = await this.instances.getInstanceMetadata(name);
+      event.sender.send('instances:get_metadata', metadata);
     });
 
     ipc.on('instances:list', async (event) => {

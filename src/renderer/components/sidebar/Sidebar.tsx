@@ -1,17 +1,43 @@
+import { useEffect, useState } from 'react';
 import { Box, Button, Flex, IconButton, Image, Text } from '@chakra-ui/react';
+import Instance from 'common/instances/instance';
+import InstanceMetadata from 'common/instances/instance-metadata';
 import { FiCopy, FiEdit, FiFolder, FiTrash2 } from 'react-icons/fi';
+import useInstances from 'renderer/hooks/useInstances';
+import useVersions from 'renderer/hooks/useVersions';
 
-export default function Sidebar() {
+interface SidebarProps {
+  instance: Instance | undefined;
+}
+
+export default function Sidebar({ instance }: SidebarProps) {
+  const { getInstanceMetadata } = useInstances();
+  const { getByName } = useVersions();
+
+  const [metadata, setMetadata] = useState<InstanceMetadata | null>(null);
+  const version = getByName(instance?.settings.manifest || '');
+
+  useEffect(() => {
+    async function fetchMetadata() {
+      if (instance) {
+        const newMetadata = await getInstanceMetadata(instance.name);
+        setMetadata(newMetadata);
+      }
+    }
+
+    fetchMetadata();
+  }, [getInstanceMetadata, instance]);
+
+  if (instance == null || metadata == null) {
+    return <div> </div>;
+  }
+
   return (
     <Box height="100%" width="250px" bg="#1A1A1A" padding="25px">
-      <Image
-        margin="auto"
-        width="75%"
-        src="https://avatars.githubusercontent.com/u/21025855?s=280&v=4"
-      />
+      <Image margin="auto" width="75%" src={instance?.icon} />
 
       <Text fontSize="18px" fontWeight="bold" textAlign="center" mt="25px">
-        Fabric 1.19.3
+        {instance?.name}
       </Text>
 
       <Box mt="25px">
@@ -19,56 +45,55 @@ export default function Sidebar() {
           Run instance
         </Button>
         <Flex mt="10px" justifyContent="space-between">
-          <IconButton aria-label="Edit instance" icon={<FiEdit />} />
-          <IconButton aria-label="Clone instance" icon={<FiCopy />} />
-          <IconButton aria-label="Open .minecraft folder" icon={<FiFolder />} />
+          <IconButton aria-label="Edit instance" icon={<FiEdit />} isDisabled />
+          <IconButton
+            aria-label="Clone instance"
+            icon={<FiCopy />}
+            isDisabled
+          />
+          <IconButton
+            aria-label="Open .minecraft folder"
+            icon={<FiFolder />}
+            isDisabled
+          />
           <IconButton
             aria-label="Delete instance"
             colorScheme="red"
             icon={<FiTrash2 />}
+            isDisabled
           />
         </Flex>
       </Box>
 
       <Box mt="25px">
         <Flex alignItems="center" justifyContent="space-between">
-          <Text fontWeight="bold">Version base:</Text>
-          <Text>1.19.3</Text>
-        </Flex>
-
-        <Flex alignItems="center" justifyContent="space-between">
-          <Text fontWeight="bold">Loader:</Text>
-          <Text>Fabric</Text>
+          <Text fontWeight="bold">Version:</Text>
+          <Text>{version?.name}</Text>
         </Flex>
 
         <Flex alignItems="center" justifyContent="space-between">
           <Text fontWeight="bold">Java:</Text>
-          <Text>17</Text>
+          <Text>{version?.manifest?.javaVersion.majorVersion}</Text>
         </Flex>
 
         <Flex alignItems="center" justifyContent="space-between">
           <Text fontWeight="bold">Mods:</Text>
-          <Text>29 (32)</Text>
+          <Text>{metadata.mods.length}</Text>
         </Flex>
 
         <Flex alignItems="center" justifyContent="space-between">
           <Text fontWeight="bold">Resource Packs:</Text>
-          <Text>7</Text>
+          <Text>{metadata.resourcepacks.length}</Text>
         </Flex>
 
         <Flex alignItems="center" justifyContent="space-between">
           <Text fontWeight="bold">Shader Packs:</Text>
-          <Text>3</Text>
+          <Text>{metadata.shaderpacks.length}</Text>
         </Flex>
 
         <Flex alignItems="center" justifyContent="space-between">
-          <Text fontWeight="bold">Servers:</Text>
-          <Text>0</Text>
-        </Flex>
-
-        <Flex alignItems="center" justifyContent="space-between">
-          <Text fontWeight="bold">World:</Text>
-          <Text>4</Text>
+          <Text fontWeight="bold">Worlds:</Text>
+          <Text>{metadata.worlds.length}</Text>
         </Flex>
       </Box>
     </Box>

@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Box, Button, Flex, Image, SimpleGrid, Text } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import Instance from 'common/instances/instance';
 import Container from 'renderer/components/container';
 import Sidebar from 'renderer/components/sidebar';
 import useInstances from 'renderer/hooks/useInstances';
@@ -7,13 +9,37 @@ import useInstances from 'renderer/hooks/useInstances';
 interface InstanceItemProps {
   name?: string;
   icon: string;
+  selected: boolean;
+  onClick: () => void;
 }
 
-function InstanceItem({ name, icon }: InstanceItemProps) {
+function InstanceItem({ name, icon, selected, onClick }: InstanceItemProps) {
   return (
-    <Box textAlign="center" width="80px" height="80px">
-      <Image src={icon} height="75%" width="75%" margin="auto" />
-      <Text bg="#1F1F1F" fontSize="14px" mt="5px">
+    <Box
+      width="80px"
+      height="80px"
+      cursor="pointer"
+      textAlign="center"
+      transition="all 70ms ease-in-out"
+      userSelect="none"
+      _hover={{
+        transform: 'scale(1.06)',
+      }}
+      onClick={onClick}
+    >
+      <Image
+        src={icon}
+        height="75%"
+        width="75%"
+        margin="auto"
+        draggable="false"
+      />
+      <Text
+        bg={selected ? 'green.300' : '#1F1F1F'}
+        color={selected ? 'black' : '#ddd'}
+        fontSize="14px"
+        mt="5px"
+      >
         {name}
       </Text>
     </Box>
@@ -22,6 +48,7 @@ function InstanceItem({ name, icon }: InstanceItemProps) {
 
 export default function Instances() {
   const { instances } = useInstances();
+  const [selectedInstance, selectInstance] = useState<Instance>();
 
   return (
     <Container>
@@ -45,8 +72,12 @@ export default function Instances() {
           {instances.map((instance, index) => (
             <InstanceItem
               key={index}
+              selected={selectedInstance === instance}
               name={instance.name}
               icon={instance.icon}
+              onClick={() => {
+                selectInstance(instance);
+              }}
             />
           ))}
 
@@ -59,7 +90,7 @@ export default function Instances() {
           <div> </div>
         </SimpleGrid>
       </Box>
-      <Sidebar />
+      <Sidebar instance={selectedInstance} />
     </Container>
   );
 }
