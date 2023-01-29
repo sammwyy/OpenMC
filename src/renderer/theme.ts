@@ -1,21 +1,30 @@
 import { extendTheme } from '@chakra-ui/react';
-import { mode, StyleFunctionProps } from '@chakra-ui/theme-tools';
-import { StepsTheme as Steps } from 'chakra-ui-steps';
+import { mode } from '@chakra-ui/theme-tools';
 
-const theme = extendTheme({
-  config: {
-    initialColorMode: 'dark',
-    useSystemColorMode: false,
-  },
-  components: {
-    Steps,
-  },
-  styles: {
-    global: (props: StyleFunctionProps) => ({
-      body: {
-        bg: mode('#FFF', '#121212')(props),
+const styles = {
+  global: (props) => ({
+    body: {
+      bg: mode('#FFFFFF', '#121212')(props),
+    },
+  }),
+};
+
+const components = {
+  Drawer: {
+    baseStyle: (props) => ({
+      dialog: {
+        bg: mode('#FFFFFF', '#121212')(props),
       },
     }),
+  },
+};
+
+const theme = extendTheme({
+  components,
+  styles,
+  config: {
+    initialColorMode: localStorage.getItem('color-mode') || 'dark',
+    useSystemColorMode: false,
   },
 });
 
