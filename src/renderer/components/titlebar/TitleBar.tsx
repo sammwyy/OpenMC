@@ -1,5 +1,4 @@
 import { Flex, Image, Text } from '@chakra-ui/react';
-
 import TitleBarSection from './titlebar-section/TitleBarSection';
 import TitleBarProfileDropdown from './titlebar-profile-dropdown/TitleBarProfileDropdown';
 
@@ -35,7 +34,6 @@ export default function TitleBar({ title }: TitleBarProps) {
           {title}
         </Text>
       </TitleBarSection>
-
       <TitleBarSection align="right">
         <TitleBarButtons />
       </TitleBarSection>

@@ -23,7 +23,7 @@ const theme = extendTheme({
   components,
   styles,
   config: {
-    initialColorMode: 'dark',
+    initialColorMode: localStorage.getItem('color-mode') || 'dark',
     useSystemColorMode: false,
   },
 });
