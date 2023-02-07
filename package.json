@@ -1,5 +1,6 @@
 {
   "name": "openmc-launcher",
+  "version": "0.0.3",
   "description": "An open source Minecraft launcher and mod manager",
   "homepage": "https://github.com/sammwyy/openmc#readme",
   "bugs": {
@@ -104,7 +105,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
-    "react-router-dom": "^6.4.0"
+    "react-router-dom": "^6.4.0",
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
@@ -121,6 +123,7 @@
     "@types/react-dom": "^18.0.6",
     "@types/react-test-renderer": "^18.0.0",
     "@types/terser-webpack-plugin": "^5.0.4",
+    "@types/unzipper": "^0.10.5",
     "@types/webpack-bundle-analyzer": "^4.4.2",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",

@@ -61,7 +61,7 @@ export default class Manager {
       const version = args[1] as Version;
       const launcher = this.launcher.instantiate(instance, version);
 
-      await launcher.prepare();
+      launcher.prepare();
       await launcher.start();
       event.sender.send('launcher:launch', null);
     });
