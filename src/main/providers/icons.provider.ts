@@ -6,9 +6,22 @@ import path from 'path';
 import unzip from '../utils/zip.utils';
 import Logger from '../logger';
 import { getSafeLauncherDir } from '../utils/dir.utils';
-import { imageToBase64 } from '../utils/file.utils';
+import { imageToBase64, downloadFileIfNotExist } from '../utils/file.utils';
 
 const FILES_EXT = ['.png', '.jpg', '.jpeg', '.webp', '.ico'];
+const DEFAULT_ICONS = {
+  DIRT: 'https://i.imgur.com/aH72PI6.png',
+  OPENMC: 'https://i.imgur.com/YLMEwEs.png',
+  OPTIFINE: 'https://i.imgur.com/mYgYa08.png',
+  PICKAXE: 'https://i.imgur.com/QMbqAdp.png',
+  CREPER: 'https://i.imgur.com/g6khqjd.png',
+  FABRIC: 'https://i.imgur.com/manAkYB.png',
+  INDIUM: 'https://i.imgur.com/40tzeVD.png',
+  LITHIUM: 'https://i.imgur.com/Ekywi3v.png',
+  SKYFACTORY: 'https://i.imgur.com/2ezp9rw.png',
+  SODIUM: 'https://i.imgur.com/Shz61E5.png',
+  WARPED_NYLLIUM: 'https://i.imgur.com/UWGrZMf.png',
+};
 
 export default class IconsProvider {
   private iconsDir: string;
@@ -30,6 +43,15 @@ export default class IconsProvider {
     }
   }
 
+  async loadDefault() {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [name, url] of Object.entries(DEFAULT_ICONS)) {
+      const filePath = path.join(this.iconsDir, `${name}.png`);
+      Logger.debug(`Downloading icon ${name} from ${url} to ${filePath}`);
+      await downloadFileIfNotExist(filePath, url);
+    }
+  }
+
   async listIcons() {
     const icons = [];
     const files = await fs.readdir(this.iconsDir);
@@ -42,7 +64,6 @@ export default class IconsProvider {
         icons.push(icon);
       }
     }
-
     Logger.debug(`Loaded ${icons.length} icons.`);
     return icons;
   }

@@ -49,6 +49,7 @@ export default class Manager {
 
     ipc.on('instances:list', async (event) => {
       Logger.debug(`Renderer call IPC function "instances:list"`);
+      await this.icons.loadDefault();
       const instances = await this.instances
         .listInstances()
         .catch((e) => Logger.crit(e.toString()));
