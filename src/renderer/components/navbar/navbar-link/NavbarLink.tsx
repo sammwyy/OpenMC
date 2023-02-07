@@ -20,6 +20,7 @@ export default function NavbarLink({ children, to }: NavbarLinkProps) {
       fontSize="16px"
       margin="0 15px"
       userSelect="none"
+      draggable="false"
       variant="unstyled"
     >
       {children}

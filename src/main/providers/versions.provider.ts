@@ -4,11 +4,6 @@ import fsSync from 'fs';
 import path from 'path';
 
 import { getSafeLauncherDir } from '../utils/dir.utils';
-import {
-  downloadFileIfNotExist,
-  downloadMavenFileIfNotExist,
-  getMavenPath,
-} from '../utils/file.utils';
 
 import Version, { VersionType } from '../../common/versions/version';
 import VersionManifest, {
@@ -16,7 +11,7 @@ import VersionManifest, {
 } from '../../common/versions/version-manifest';
 import RemoteVersionManifest from '../../common/versions/remote-version-manifest';
 import Logger from '../logger';
-import { mergeVersions, normalizeVersion } from '../utils/version.utils';
+import LauncherProvider from './launcher.provider';
 
 const WELL_KNOWN_MOD = ['labymod', 'fabric', 'forge', 'liteloader', 'optifine'];
 
@@ -72,87 +67,22 @@ async function listRemotes(): Promise<Version[]> {
 }
 
 export default class VersionsProvider {
+  private readonly launcher: LauncherProvider;
+
   private librariesDir: string;
   private versionsDir: string;
 
-  constructor() {
+  constructor(launcher: LauncherProvider) {
+    this.launcher = launcher;
+
     this.librariesDir = getSafeLauncherDir('libraries');
     this.versionsDir = getSafeLauncherDir('versions');
   }
 
-  async downloadVersion(
-    version: Version,
-    onDownloadStart: () => void,
-    onFileDownloaded: (file: string) => void,
-    onDownloadEnd: (error: boolean) => void
-  ) {
-    onDownloadStart();
-    Logger.info(`Started download for version: ${version.name}.`);
-
-    const { manifest } = version;
-    if (manifest) {
-      const jarFile = path.join(
-        this.versionsDir,
-        version.name,
-        `${version.name}.jar`
-      );
-      downloadFileIfNotExist(jarFile, manifest.downloads.client.url);
-
-      for (let i = 0; i < manifest.libraries.length; i += 1) {
-        const lib = manifest.libraries[i];
-        const artifact = lib.downloads?.artifact;
-
-        onFileDownloaded(lib.name);
-        Logger.info(`Downloading lib ${lib.name}.`);
-
-        if (artifact) {
-          const libPath = path.join(this.librariesDir, artifact.path || '');
-          await downloadFileIfNotExist(libPath, artifact.url);
-        } else {
-          await downloadMavenFileIfNotExist(
-            this.librariesDir,
-            lib.url || '',
-            lib.name
-          );
-        }
-      }
-    }
-
-    Logger.info(`Finished download for version: ${version.name}.`);
-    onDownloadEnd(false);
-  }
-
   async isVersionDownloaded(version: Version) {
-    const jarFile = path.join(
-      this.versionsDir,
-      version.name,
-      `${version.name}.jar`
-    );
-
-    if (!fsSync.existsSync(jarFile) || !version.manifest) {
-      return false;
-    }
-
-    const libs = version.manifest.libraries;
-
-    for (let i = 0; i < libs?.length; i += 1) {
-      const lib = libs[i];
-      const artifact = lib.downloads?.artifact;
-
-      let libPath = '';
-
-      if (artifact) {
-        libPath = path.join(this.librariesDir, artifact.path || '');
-      } else {
-        libPath = path.join(this.librariesDir, getMavenPath(lib.url || ''));
-      }
-
-      if (!fsSync.existsSync(libPath)) {
-        return false;
-      }
-    }
-
-    return true;
+    const client = this.launcher.instantiate(null, version);
+    client.prepare();
+    return client.isDownloaded();
   }
 
   async listLocals(): Promise<Version[]> {
@@ -173,24 +103,6 @@ export default class VersionsProvider {
           });
           const manifest: VersionManifest = JSON.parse(raw);
           const version = parseVersion(manifest);
-
-          if (manifest.inheritsFrom) {
-            const parent = await this.getVersion(manifest.inheritsFrom);
-            if (parent) {
-              const merged = normalizeVersion(mergeVersions(parent, version));
-              version.manifest = merged.manifest;
-              manifest.inheritsFrom = undefined;
-
-              await fs.writeFile(
-                manifestFile,
-                JSON.stringify(version.manifest),
-                {
-                  encoding: 'utf-8',
-                }
-              );
-            }
-          }
-
           const downloaded = await this.isVersionDownloaded(version);
           version.status = downloaded ? 'ready' : 'missing';
           versions.push(version);
@@ -199,7 +111,6 @@ export default class VersionsProvider {
     }
 
     Logger.info(`Loaded ${versions.length} versions from cache.`);
-
     return versions;
   }
 

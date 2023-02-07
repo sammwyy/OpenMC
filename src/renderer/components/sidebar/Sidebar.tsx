@@ -5,8 +5,9 @@ import InstanceMetadata from 'common/instances/instance-metadata';
 import { FiCopy, FiEdit, FiFolder, FiTrash2 } from 'react-icons/fi';
 import useInstances from 'renderer/hooks/useInstances';
 import useVersions from 'renderer/hooks/useVersions';
-import { downloadVersion } from 'renderer/services/versions.service';
 import { launchInstance } from 'renderer/services/launcher.service';
+import useDownload from 'renderer/hooks/useDownload';
+import Version from 'common/versions/version';
 
 interface SidebarProps {
   instance: Instance | undefined;
@@ -15,9 +16,10 @@ interface SidebarProps {
 export default function Sidebar({ instance }: SidebarProps) {
   const { getInstanceMetadata, updateInstance } = useInstances();
   const { getByName } = useVersions();
+  const { downloadVersion, versionDownloading } = useDownload();
 
   const [metadata, setMetadata] = useState<InstanceMetadata | null>(null);
-  const version = getByName(instance?.settings.manifest || '');
+  const [version, setVersion] = useState<Version | null>(null);
 
   useEffect(() => {
     async function fetchMetadata() {
@@ -30,6 +32,11 @@ export default function Sidebar({ instance }: SidebarProps) {
     fetchMetadata();
   }, [getInstanceMetadata, instance]);
 
+  useEffect(() => {
+    setVersion(getByName(instance?.settings.manifest || ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [instance, versionDownloading]);
+
   if (instance == null || metadata == null) {
     return <div> </div>;
   }
@@ -37,6 +44,10 @@ export default function Sidebar({ instance }: SidebarProps) {
   function statusToColor() {
     if (instance?.launching) {
       return 'red';
+    }
+
+    if (versionDownloading && versionDownloading.name === version?.name) {
+      return 'yellow';
     }
 
     switch (version?.status) {
@@ -56,6 +67,10 @@ export default function Sidebar({ instance }: SidebarProps) {
       return 'Launching...';
     }
 
+    if (versionDownloading && versionDownloading.name === version?.name) {
+      return 'Downloading...';
+    }
+
     switch (version?.status) {
       case 'downloading':
         return 'Downloading...';
@@ -69,6 +84,8 @@ export default function Sidebar({ instance }: SidebarProps) {
   }
 
   function canRunAction() {
+    if (versionDownloading) return false;
+
     if (instance?.launching) return false;
     return version?.status === 'missing' || version?.status === 'ready';
   }

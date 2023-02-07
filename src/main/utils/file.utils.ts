@@ -34,7 +34,6 @@ export function downloadFile(file: string, url: string) {
       const dir = path.join(file, '..');
       await fs.mkdir(dir, { recursive: true });
       await fs.writeFile(file, '');
-
       const res = await fetch(url);
       const fileStream = fsSync.createWriteStream(file);
       res.body.pipe(fileStream);
@@ -78,7 +77,6 @@ export function downloadMavenFile(
 ) {
   const filePath = getMavenPath(artifact);
   const url = getMavenURL(repositoy, filePath);
-
   return downloadFile(path.join(target, filePath), url);
 }
 
@@ -89,6 +87,5 @@ export async function downloadMavenFileIfNotExist(
 ) {
   const filePath = getMavenPath(artifact);
   const url = getMavenURL(repositoy, filePath);
-
   return downloadFileIfNotExist(path.join(target, filePath), url);
 }

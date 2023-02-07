@@ -8,18 +8,26 @@ export type Channels =
   | 'instances:list'
   | 'launcher:launch'
   | 'versions:download'
+  | 'versions:download_start'
+  | 'versions:download_progress'
+  | 'versions:download_end'
   | 'versions:download_manifest'
   | 'versions:list'
   | 'window:close'
   | 'window:minimize'
   | 'window:maximize';
 
+type RemoveFnCallback = () => void;
+
 const electronHandler = {
   ipcRenderer: {
     sendMessage(channel: Channels, args: unknown[]) {
       ipcRenderer.send(channel, args);
     },
-    on(channel: Channels, func: (...args: unknown[]) => void) {
+    on(
+      channel: Channels,
+      func: (...args: unknown[]) => void
+    ): RemoveFnCallback {
       const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
         func(...args);
       ipcRenderer.on(channel, subscription);

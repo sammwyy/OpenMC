@@ -19,30 +19,36 @@ import CreateInstance from './screens/instances/create_instance';
 import theme from './theme';
 import './styles/scroll.css';
 import Logs from './screens/logs';
+import DownloadProvider from './contexts/download/download-provider';
 
 export default function App() {
   return (
     <LogsProvider>
-      <InstancesProvider>
-        <VersionsProvider>
-          <ChakraProvider theme={theme}>
-            <Router>
-              <TitleBar title="OpenMC" />
-              <Navbar />
+      <VersionsProvider>
+        <DownloadProvider>
+          <InstancesProvider>
+            <ChakraProvider theme={theme}>
+              <Router>
+                <TitleBar title="OpenMC" />
+                <Navbar />
 
-              <Routes>
-                <Route path="/" element={<Main />} />
-                <Route path="/logs" element={<Logs />} />
+                <Routes>
+                  <Route path="/" element={<Main />} />
+                  <Route path="/logs" element={<Logs />} />
 
-                <Route path="/instances" element={<Instances />} />
-                <Route path="/instances/create" element={<CreateInstance />} />
-              </Routes>
+                  <Route path="/instances" element={<Instances />} />
+                  <Route
+                    path="/instances/create"
+                    element={<CreateInstance />}
+                  />
+                </Routes>
 
-              <DownloadBar />
-            </Router>
-          </ChakraProvider>
-        </VersionsProvider>
-      </InstancesProvider>
+                <DownloadBar />
+              </Router>
+            </ChakraProvider>
+          </InstancesProvider>
+        </DownloadProvider>
+      </VersionsProvider>
     </LogsProvider>
   );
 }

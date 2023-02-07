@@ -17,7 +17,7 @@ export default class Manager {
     this.icons = new IconsProvider();
     this.instances = new InstanceProvider();
     this.launcher = new LauncherProvider();
-    this.versions = new VersionsProvider();
+    this.versions = new VersionsProvider(this.launcher);
   }
 
   registerIPC(ipc: IpcMain) {
@@ -59,35 +59,36 @@ export default class Manager {
       Logger.debug(`Renderer call IPC function "launcher:launch"`);
       const instance = args[0] as Instance;
       const version = args[1] as Version;
-      await this.launcher
-        .launch(instance, version)
-        .catch((e) => Logger.crit(e.toString()));
-      event.sender.send('launcher:launch', []);
+      const launcher = this.launcher.instantiate(instance, version);
+
+      await launcher.prepare();
+      await launcher.start();
+      event.sender.send('launcher:launch', null);
     });
 
     ipc.on('versions:download', async (event, args) => {
       Logger.debug(`Renderer call IPC function "versions:download"`);
       const version = args[0] as Version;
+      const launcher = this.launcher.instantiate(null, version as Version);
 
-      function onStart() {
-        event.sender.send('versions:download', ['start', version.name]);
-      }
+      launcher.on('download_start', (e) => {
+        event.sender.send('versions:download_start', e);
+      });
 
-      function onDownloadFile(file: string) {
-        event.sender.send('versions:download', ['file', version.name, file]);
-      }
+      launcher.on('download_progress', (e) => {
+        event.sender.send('versions:download_progress', e);
+      });
 
-      function onEnd(error: boolean) {
-        if (error) {
-          event.sender.send('versions:download', ['error', version.name]);
-        } else {
-          event.sender.send('versions:download', ['end', version.name]);
-        }
-      }
+      launcher.on('download_end', (e) => {
+        event.sender.send('versions:download_end', e);
+      });
 
-      this.versions
-        .downloadVersion(version, onStart, onDownloadFile, onEnd)
-        .catch((e) => Logger.crit(e.toString()));
+      launcher.prepare();
+      await launcher.download().catch((e) => {
+        event.sender.send('versions:download_end', { error: e });
+      });
+      version.status = 'ready';
+      event.sender.send('versions:download', version);
     });
 
     ipc.on('versions:download_manifest', async (event, args) => {

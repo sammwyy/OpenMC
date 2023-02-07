@@ -9,10 +9,10 @@ import VersionsContext from './versions-context';
 
 export default function VersionsProvider({ children }: PropsWithChildren) {
   const [versions, setVersions] = useState<Version[]>([]);
-  const [lastFile, setLastFile] = useState<string | null>(null);
 
-  function updateVersion(version: Version) {
-    setVersions([...versions.filter((v) => v !== version), version]);
+  async function updateVersions() {
+    const result = await listVersions();
+    setVersions(result);
   }
 
   async function downloadManifest(version: Version): Promise<Version> {
@@ -20,7 +20,7 @@ export default function VersionsProvider({ children }: PropsWithChildren) {
       version.manifestUrl || ''
     );
     version.manifest = versionWithManifest;
-    updateVersion(version);
+    updateVersions();
     return version;
   }
 
@@ -40,58 +40,18 @@ export default function VersionsProvider({ children }: PropsWithChildren) {
   }
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    listVersions()
-      .then((v) => setVersions(v || []))
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    function downloadVersion(status: string, name: string, file: string) {
-      const version = getByName(name);
-
-      if (!version) {
-        return;
-      }
-
-      if (status === 'start') {
-        version.status = 'downloading';
-        setLastFile('');
-      } else if (status === 'error') {
-        version.status = 'missing';
-        setLastFile(null);
-      } else if (status === 'end') {
-        version.status = 'ready';
-        setLastFile(null);
-      } else if (status === 'file' && file) {
-        setLastFile(file);
-      }
-
-      updateVersion(version);
-    }
-
-    if (versions.length > 0) {
-      window.electron.ipcRenderer.on('versions:download', (_args) => {
-        const args = _args as unknown as string[];
-
-        const status = args[0] as string;
-        const name = args[1] as string;
-        const file = args[2] as string;
-
-        downloadVersion(status, name, file);
-      });
-    }
+    updateVersions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [versions]);
+  }, []);
 
   return (
     <VersionsContext.Provider
       value={{
         versions,
-        lastFile,
         downloadManifest,
         getByType,
         getByName,
+        updateVersions,
       }}
     >
       {children}
