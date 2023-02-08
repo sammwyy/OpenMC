@@ -5,6 +5,9 @@ import Instance from 'common/instances/instance';
 import Version from 'common/versions/version';
 import { getSafeLauncherDir } from '../utils/dir.utils';
 import Logger from '../logger';
+import ramData from '../../common/ram.json';
+import playerData from '../../common/player.json'
+import fs from 'fs';
 
 export default class LauncherProvider {
   private assetsDir: string;
@@ -30,7 +33,7 @@ export default class LauncherProvider {
 
     const launcher = new MinecraftLauncher({
       authentication: {
-        name: 'Player',
+        name: playerData.nick,
       },
       gameRoot: mcDir,
       assetsRoot: this.assetsDir,
@@ -38,8 +41,8 @@ export default class LauncherProvider {
       nativesRoot: this.nativesDir,
       versionRoot: this.versionsDir,
       memory: {
-        min: 1024,
-        max: 2048,
+        min: parseInt(ramData.min),
+        max: parseInt(ramData.max),
       },
       version: {
         number: version.name,
