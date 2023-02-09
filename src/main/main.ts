@@ -16,6 +16,7 @@ import Manager from './manager';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Logger from './logger';
+import launcher from './providers/launcher.provider';
 const fs = require('fs');
 
 class AppUpdater {
@@ -115,8 +116,17 @@ const createWindow = async () => {
   ipcMain.on('config:write', (event, args) => {
     const minvalue = args[0];
     const maxvalue = args[1];
-    const dataRam = `{"min":"${minvalue}", "max":"${maxvalue}"}`;
-    fs.writeFileSync('./src/common/ram.json', dataRam);
+    const ramSize = args[2];
+
+    if(ramSize === 1) {
+      const minvalueGB = minvalue * 1024;
+      const maxvalueGB = maxvalue * 1024;
+      const dataRam = `{"min":"${minvalueGB}", "max":"${maxvalueGB}"}`;
+      fs.writeFileSync('./src/common/ram.json', dataRam);
+    } else {
+      const dataRam = `{"min":"${minvalue}", "max":"${maxvalue}"}`;
+      fs.writeFileSync('./src/common/ram.json', dataRam);
+    }
   });
 
   // Change nickname
