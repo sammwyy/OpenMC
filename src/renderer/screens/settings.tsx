@@ -5,6 +5,7 @@ import {
     Box,
     Center,
     Flex,
+    flexbox,
     FormLabel,
     Image,
     Input,
@@ -20,6 +21,7 @@ import {
   import { adjustRam } from 'renderer/services/ram.service';
   import { adjustNick } from 'renderer/services/nickname.service';
   import playerData from '../../common/player.json';
+  import ramData from '../../common/ram.json';
   
   interface StateProps {
     value: string;
@@ -33,17 +35,10 @@ import {
   }
   
   const VALID_NAME_CHARS = /^[a-zA-Z0-9-_]+$/;
-  var INVALID_NAME_MESSAGE = '';
-  var INVALID_RAM_MESSAGE = ''
 
   function isNameInvalid(nick: string) {
     for (let i = 0; i < nick.length; i += 1) {
-      if (!nick.match(VALID_NAME_CHARS)) {
-        INVALID_NAME_MESSAGE = 'Invalid characters!'
-        return true;
-      }
-      else if (nick.length < 3) {
-        INVALID_NAME_MESSAGE = 'Must be at least 3 characters long!'
+      if (!nick.match(VALID_NAME_CHARS) || nick.length < 3) {
         return true;
       }
       else {
@@ -58,13 +53,7 @@ import {
 
     if(isNaN(minvalue) || isNaN(maxvalue)) {
     }
-    else if(minvalue > maxvalue) {
-        INVALID_RAM_MESSAGE = 'Min value can´t be grater than max value!'
-        return true;
-    }
-
-    else if(minvalue < 1024) {
-        INVALID_RAM_MESSAGE = 'Minimum value can´t be less than 1024!'
+    else if(minvalue > maxvalue || minvalue < 1024) {
         return true;
     }
 
@@ -78,18 +67,12 @@ import {
     const invalidName = isNameInvalid(value);
   
     return (
-      <Box>
+      <Flex display={"column"} width="60%" alignContent={"center"}>
+        <Box width={"100%"}>
+          {invalidName}
+        </Box>
+
         <FormLabel>Nickname:</FormLabel>
-  
-        {invalidName && (
-          <Alert status="error" borderLeft="2px solid red">
-            <AlertTitle>Invalid name:</AlertTitle>
-            <AlertDescription>
-              {INVALID_NAME_MESSAGE}
-            </AlertDescription>
-          </Alert>
-        )}
-  
         <Input
           placeholder={playerData.nick}
           variant="flushed"
@@ -97,7 +80,7 @@ import {
           onChange={(nick) => setValue(nick.target.value)}
           isInvalid={invalidName}
         />
-      </Box>
+      </Flex>
     );
   }
 
@@ -105,32 +88,25 @@ import {
     const invalidRam = isRamInvalid(minval, maxval);
     
     return (
-      <Box>
-        {invalidRam && (
-          <Alert status="error" borderLeft="2px solid red">
-            <AlertTitle>Invalid RAM configuraton:</AlertTitle>
-            <AlertDescription>
-              {INVALID_RAM_MESSAGE}
-            </AlertDescription>
-          </Alert>
-        )}
+      <Flex display={"column"} width='60%'>
+        {invalidRam}
 
         <FormLabel>RAM:</FormLabel>
         <Input
-          placeholder="Minimum"
+          placeholder={ramData.min}
           variant="flushed"
           value={minval}
           onChange={(e) => setRammn(e.target.value)}
           isInvalid={invalidRam}
         />
         <Input
-          placeholder="Maximum"
+          placeholder={ramData.max}
           variant="flushed"
           value={maxval}
           onChange={(e) => setRammx(e.target.value)}
           isInvalid={invalidRam}
         />
-      </Box>
+      </Flex>
     );
   }
   
@@ -142,11 +118,11 @@ import {
 
     return (
       <Container>
-        <Flex margin="auto" width="500px" justifyContent={'center'}>
-            <Nickname setValue={setName} value={name} />
-        </Flex>
-        <Flex margin="auto" width="500px" justifyContent={'center'}>
-            <Ram minval={minRam} maxval={maxRam} setRammn={setRammn} setRammx={setRammx}/>
+        <Flex margin="auto" width="500px" alignItems={"center"}>
+            <Flex width="500px" direction="row" gap="20%">
+                <Nickname setValue={setName} value={name} />
+                <Ram minval={minRam} maxval={maxRam} setRammn={setRammn} setRammx={setRammx}/>
+            </Flex>
         </Flex>
       </Container>
     );
