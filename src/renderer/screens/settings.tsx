@@ -17,6 +17,9 @@ import {
   } from '@chakra-ui/react';
   import { SetStateAction, useEffect, useState } from 'react';
   import Container from 'renderer/components/container';
+  import { adjustRam } from 'renderer/services/ram.service';
+  import { adjustNick } from 'renderer/services/nickname.service';
+  import playerData from '../../common/player.json';
   
   interface StateProps {
     value: string;
@@ -29,43 +32,50 @@ import {
     setRammx: React.Dispatch<React.SetStateAction<string>>;
   }
   
-  const INVALID_NAME_CHARS = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
-  var INVALID_RAM = ''
+  const VALID_NAME_CHARS = /^[a-zA-Z0-9-_]+$/;
+  var INVALID_NAME_MESSAGE = '';
+  var INVALID_RAM_MESSAGE = ''
 
-  import dataRam from '../../common/ram.json';
-  import playerData from '../../common/player.json';
-  
   function isNameInvalid(nick: string) {
-    for (let i = 0; i < INVALID_NAME_CHARS.length; i += 1) {
-      const char = INVALID_NAME_CHARS[i];
-      if (nick.includes(char) || nick.length < 3) {
+    for (let i = 0; i < nick.length; i += 1) {
+      if (!nick.match(VALID_NAME_CHARS)) {
+        INVALID_NAME_MESSAGE = 'Invalid characters!'
         return true;
       }
+      else if (nick.length < 3) {
+        INVALID_NAME_MESSAGE = 'Must be at least 3 characters long!'
+        return true;
+      }
+      else {
+        // Adjust nickname
+        adjustNick(nick);
+      }
     }
-    }
+  }
   function isRamInvalid(minimum: string, maximum: string) {
     const minvalue = parseInt(minimum);
     const maxvalue = parseInt(maximum);
-    console.log(minvalue)
+
     if(isNaN(minvalue) || isNaN(maxvalue)) {
-        INVALID_RAM = 'Please input a number!'
-        return true;
     }
     else if(minvalue > maxvalue) {
-        INVALID_RAM = 'Min value can´t be grater than max value!'
+        INVALID_RAM_MESSAGE = 'Min value can´t be grater than max value!'
         return true;
     }
 
     else if(minvalue < 1024) {
-        INVALID_RAM = 'Minimum value can´t be less than 1024!'
-        return true
-    };
+        INVALID_RAM_MESSAGE = 'Minimum value can´t be less than 1024!'
+        return true;
+    }
 
-  }
+    else {
+      //Adjust RAM
+      adjustRam(minimum, maximum);
+    }
+  };
   
   function Nickname({ value, setValue }: StateProps) {
     const invalidName = isNameInvalid(value);
-    var value = playerData.nick
   
     return (
       <Box>
@@ -75,13 +85,13 @@ import {
           <Alert status="error" borderLeft="2px solid red">
             <AlertTitle>Invalid name:</AlertTitle>
             <AlertDescription>
-              Invalid Nickname
+              {INVALID_NAME_MESSAGE}
             </AlertDescription>
           </Alert>
         )}
   
         <Input
-          placeholder='Player'
+          placeholder={playerData.nick}
           variant="flushed"
           value={value}
           onChange={(nick) => setValue(nick.target.value)}
@@ -93,13 +103,14 @@ import {
 
   function Ram({ minval, maxval, setRammn, setRammx }: StateRam) {
     const invalidRam = isRamInvalid(minval, maxval);
+    
     return (
       <Box>
         {invalidRam && (
           <Alert status="error" borderLeft="2px solid red">
             <AlertTitle>Invalid RAM configuraton:</AlertTitle>
             <AlertDescription>
-              {INVALID_RAM}
+              {INVALID_RAM_MESSAGE}
             </AlertDescription>
           </Alert>
         )}
@@ -127,7 +138,6 @@ import {
     const [name, setName] = useState('');
     const [minRam, setRammn] = useState('');
     const [maxRam, setRammx] = useState('');
-    dataRam.max = setRammx;
 
 
     return (

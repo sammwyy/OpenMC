@@ -16,6 +16,7 @@ import Manager from './manager';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Logger from './logger';
+const fs = require('fs');
 
 class AppUpdater {
   constructor() {
@@ -70,6 +71,8 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minWidth: 768,
+    minHeight: 512,
     icon: getAssetPath('icon.png'),
     frame: false,
     webPreferences: {
@@ -106,6 +109,21 @@ const createWindow = async () => {
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
+  });
+
+  // Change RAM parameters
+  ipcMain.on('config:write', (event, args) => {
+    const minvalue = args[0];
+    const maxvalue = args[1];
+    const dataRam = `{"min":"${minvalue}", "max":"${maxvalue}"}`;
+    fs.writeFileSync('./src/common/ram.json', dataRam);
+  });
+
+  // Change nickname
+  ipcMain.on('user:write', (event, args) => {
+    const nickname = args[0];
+    const dataNick = `{"nick":"${nickname}", "mode":"Offline"}`;
+    fs.writeFileSync('./src/common/player.json', dataNick);
   });
 
   // Remove this if your app does not use auto updates

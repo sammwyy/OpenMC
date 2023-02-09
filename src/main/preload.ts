@@ -15,6 +15,9 @@ export type Channels =
   | 'versions:list'
   | 'window:close'
   | 'window:minimize'
+  | 'config:read'
+  | 'config:write'
+  | 'user:write'
   | 'window:maximize';
 
 type RemoveFnCallback = () => void;
