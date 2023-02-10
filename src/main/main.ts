@@ -16,7 +16,7 @@ import Manager from './manager';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Logger from './logger';
-import launcher from './providers/launcher.provider';
+import LauncherProvider from './providers/launcher.provider';
 const fs = require('fs');
 
 class AppUpdater {
@@ -114,8 +114,8 @@ const createWindow = async () => {
 
   // Change RAM parameters
   ipcMain.on('config:write', (event, args) => {
-    const minvalue = args[0];
-    const maxvalue = args[1];
+    const minvalue = parseInt(args[0]);
+    const maxvalue = parseInt(args[1]);
     const ramSize = args[2];
 
     if(ramSize === 1) {
@@ -126,6 +126,11 @@ const createWindow = async () => {
     } else {
       const dataRam = `{"min":"${minvalue}", "max":"${maxvalue}"}`;
       fs.writeFileSync('./src/common/ram.json', dataRam);
+    }
+    class Manager {
+      constructor() {
+        this.launcher = new LauncherProvider();
+      }
     }
   });
 

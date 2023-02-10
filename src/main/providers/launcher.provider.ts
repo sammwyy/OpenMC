@@ -7,7 +7,6 @@ import { getSafeLauncherDir } from '../utils/dir.utils';
 import Logger from '../logger';
 import ramData from '../../common/ram.json';
 import playerData from '../../common/player.json'
-import fs from 'fs';
 
 export default class LauncherProvider {
   private assetsDir: string;

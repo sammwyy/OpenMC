@@ -1,31 +1,22 @@
 import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
     Box,
-    Center,
     Flex,
-    flexbox,
     FormLabel,
-    Image,
     Input,
-    SimpleGrid,
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
-    Tabs,
     Select
   } from '@chakra-ui/react';
-  import { SetStateAction, useEffect, useState } from 'react';
+  import { useState } from 'react';
   import Container from 'renderer/components/container';
   import { adjustRam } from 'renderer/services/ram.service';
   import { adjustNick } from 'renderer/services/nickname.service';
 
   import playerData from '../../common/player.json';
   import ramData from '../../common/ram.json';
+  // Placeholder values for RAM adjustment
+  var plRamMin = '';
+  var plRamMax = '';
   
-  interface StateProps {
+  interface StateNick {
     value: string;
     setValue: React.Dispatch<React.SetStateAction<string>>;
   }
@@ -38,9 +29,11 @@ import {
     setSelects: React.Dispatch<React.SetStateAction<number>>;
   }
   
+  // Valid chars in nickname
   const VALID_NAME_CHARS = /^[a-zA-Z0-9-_]+$/;
 
-  function isNameInvalid(nick: string) {
+  // Check if nickname is valid and apply the changes
+  function checkNick(nick: string) {
     for (let i = 0; i < nick.length; i += 1) {
       if (!nick.match(VALID_NAME_CHARS) || nick.length < 3 ||  nick.length > 16) {
         return true;
@@ -51,22 +44,36 @@ import {
       }
     }
   }
+
+  // Check if RAM value is valid and apply the changes
   function checkRam(minimum: string, maximum: string, ramSize: number) {
     var minvalue = parseInt(minimum);
     var maxvalue = parseInt(maximum);
 
+    // If RAM type is GB
     if(ramSize === 1) {
+      plRamMin = (parseInt(ramData.min) / 1024).toString();
+      plRamMax = (parseInt(ramData.max) / 1024).toString();
+
+      if(minimum == '' && maximum == '') return;
       if(isNaN(minvalue) || isNaN(maxvalue)) {
-       return;
+       return true;
       }
       if(minvalue > maxvalue) return true;
       else if(minvalue < 1) return true;
       else if(maxvalue > 32) return true;
       adjustRam(minimum, maximum, ramSize);
     }
-    else if(ramSize === 0) {
+    
+    // If RAM type is MB
+    if(ramSize === 0) {
+      plRamMin = ramData.min;
+      plRamMax = ramData.max;
+
+      if(minimum == '' && maximum == '') return;
       if(isNaN(minvalue) || isNaN(maxvalue)) {
-        return;
+        console.log(minvalue, maxvalue)
+        return true;
       }
       if (minvalue < 1024) return true;
       else if (minvalue > maxvalue) return true;
@@ -75,8 +82,9 @@ import {
     }
   };
   
-  function Nickname({ value, setValue }: StateProps) {
-    const invalidName = isNameInvalid(value);
+  // Nickname input
+  function Nickname({ value, setValue }: StateNick) {
+    const invalidName = checkNick(value);
   
     return (
       <Flex display={"column"} width="60%" alignContent={"center"}>
@@ -96,9 +104,10 @@ import {
     );
   }
 
+  // RAM input
   function Ram({ minval, maxval, setRammn, setRammx, selects, setSelects }: StateRam) {
     const invalidRam = checkRam(minval, maxval, selects);
-    
+
     return (
       <Flex display={"column"} width='60%'>
         {invalidRam}
@@ -106,26 +115,26 @@ import {
         <FormLabel>Ram:</FormLabel>
         <Flex direction={"row"}>
           <Input
-              placeholder={ramData.min}
+              placeholder={plRamMin}
               variant="flushed"
               value={minval}
               onChange={(e) => setRammn(e.target.value)}
               isInvalid={invalidRam}
           />
-          <Select value={selects} onChange={e => setSelects( parseInt(e.target.value))} variant="flushed" width={"75px"} alignContent="left" id='ramType'>
+          <Select value={selects} onChange={e => setSelects(parseInt(e.target.value))} variant="flushed" width={"75px"} alignContent="left" id='ramType'>
             <option value={0}>MB</option>
             <option value={1}>GB</option>
           </Select>
         </Flex>
         <Flex direction={"row"}>
           <Input
-            placeholder={ramData.max}
+            placeholder={plRamMax}
             variant="flushed"
             value={maxval}
             onChange={(e) => setRammx(e.target.value)}
             isInvalid={invalidRam}
           />
-          <Select value={selects} onChange={e => setSelects( parseInt(e.target.value))} variant="flushed" width={"75px"} id='ramType2'>
+          <Select value={selects} onChange={e => setSelects(parseInt(e.target.value))} variant="flushed" width={"75px"} id='ramType2'>
             <option value={0}>MB</option>
             <option value={1}>GB</option>
           </Select>
@@ -134,12 +143,11 @@ import {
     );
   }
   
-  export default function CreateInstance() {
+  export default function CreateSettings() {
     const [name, setName] = useState('');
     const [minRam, setRammn] = useState('');
     const [maxRam, setRammx] = useState('');
     const [selects, setSelect] = useState(0);
-
 
     return (
       <Container>
