@@ -56,9 +56,7 @@ import {
       plRamMax = (parseInt(ramData.max) / 1024).toString();
 
       if(minimum == '' && maximum == '') return;
-      if(isNaN(minvalue) || isNaN(maxvalue)) {
-       return true;
-      }
+      if(isNaN(minvalue) || isNaN(maxvalue)) return true;
       if(minvalue > maxvalue) return true;
       else if(minvalue < 1) return true;
       else if(maxvalue > 32) return true;
@@ -71,10 +69,7 @@ import {
       plRamMax = ramData.max;
 
       if(minimum == '' && maximum == '') return;
-      if(isNaN(minvalue) || isNaN(maxvalue)) {
-        console.log(minvalue, maxvalue)
-        return true;
-      }
+      if(isNaN(minvalue) || isNaN(maxvalue)) return true;
       if (minvalue < 1024) return true;
       else if (minvalue > maxvalue) return true;
       else if(maxvalue > 32768) return true;

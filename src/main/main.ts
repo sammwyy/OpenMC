@@ -127,11 +127,6 @@ const createWindow = async () => {
       const dataRam = `{"min":"${minvalue}", "max":"${maxvalue}"}`;
       fs.writeFileSync('./src/common/ram.json', dataRam);
     }
-    class Manager {
-      constructor() {
-        this.launcher = new LauncherProvider();
-      }
-    }
   });
 
   // Change nickname
