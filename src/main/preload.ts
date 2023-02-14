@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
   | 'app:log'
+  | 'config:read'
+  | 'config:save'
   | 'icons:list'
   | 'instances:create'
   | 'instances:get_metadata'
@@ -15,9 +17,6 @@ export type Channels =
   | 'versions:list'
   | 'window:close'
   | 'window:minimize'
-  | 'config:read'
-  | 'config:write'
-  | 'user:write'
   | 'window:maximize';
 
 type RemoveFnCallback = () => void;

@@ -2,18 +2,23 @@ import Instance from 'common/instances/instance';
 import Version from 'common/versions/version';
 import { IpcMain } from 'electron';
 import Logger from './logger';
+import ConfigProvider from './providers/config.provider';
 import IconsProvider from './providers/icons.provider';
 import InstanceProvider from './providers/instance.provider';
 import LauncherProvider from './providers/launcher.provider';
 import VersionsProvider from './providers/versions.provider';
+import {saveConfig} from './providers/launcher.provider';
+
 
 export default class Manager {
+  private readonly config: ConfigProvider;
   private readonly icons: IconsProvider;
   private readonly instances: InstanceProvider;
   private readonly launcher: LauncherProvider;
   private readonly versions: VersionsProvider;
 
   constructor() {
+    this.config = new ConfigProvider();
     this.icons = new IconsProvider();
     this.instances = new InstanceProvider();
     this.launcher = new LauncherProvider();
@@ -57,6 +62,7 @@ export default class Manager {
 
     ipc.on('launcher:launch', async (event, args) => {
       Logger.debug(`Renderer call IPC function "launcher:launch"`);
+      saveConfig();
       const instance = args[0] as Instance;
       const version = args[1] as Version;
       const launcher = this.launcher.instantiate(instance, version);
@@ -106,6 +112,22 @@ export default class Manager {
         .listVersions()
         .catch((e) => Logger.crit(e.toString()));
       event.sender.send('versions:list', versions);
+    });
+
+    ipc.on('config:read', async (event) => {
+      const config = await this.config
+      .loadConfig()
+      .catch((e) => Logger.crit(e.toString()));
+      event.sender.send('config:read', config);
+    });
+
+      // Change RAM parameters
+    ipc.on('config:save', (event, args) => {
+      const minRamValue = args[0];
+      const maxRamValue = args[1];
+      const username = args[2];
+      
+      new ConfigProvider().saveConfig(minRamValue, maxRamValue, username);
     });
   }
 }

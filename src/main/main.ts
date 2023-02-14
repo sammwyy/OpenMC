@@ -16,7 +16,6 @@ import Manager from './manager';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Logger from './logger';
-import LauncherProvider from './providers/launcher.provider';
 const fs = require('fs');
 
 class AppUpdater {
@@ -112,29 +111,6 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
-  // Change RAM parameters
-  ipcMain.on('config:write', (event, args) => {
-    const minvalue = parseInt(args[0]);
-    const maxvalue = parseInt(args[1]);
-    const ramSize = args[2];
-
-    if(ramSize === 1) {
-      const minvalueGB = minvalue * 1024;
-      const maxvalueGB = maxvalue * 1024;
-      const dataRam = `{"min":"${minvalueGB}", "max":"${maxvalueGB}"}`;
-      fs.writeFileSync('./src/common/ram.json', dataRam);
-    } else {
-      const dataRam = `{"min":"${minvalue}", "max":"${maxvalue}"}`;
-      fs.writeFileSync('./src/common/ram.json', dataRam);
-    }
-  });
-
-  // Change nickname
-  ipcMain.on('user:write', (event, args) => {
-    const nickname = args[0];
-    const dataNick = `{"nick":"${nickname}", "mode":"Offline"}`;
-    fs.writeFileSync('./src/common/player.json', dataNick);
-  });
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
