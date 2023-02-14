@@ -1,10 +1,24 @@
 import path from 'path';
 import { MinecraftLauncher } from 'minecraft-launcher-js';
 
+import ConfigProvider from './config.provider';
 import Instance from 'common/instances/instance';
 import Version from 'common/versions/version';
 import { getSafeLauncherDir } from '../utils/dir.utils';
 import Logger from '../logger';
+
+var minRam = 1024;
+var maxRam = 2048;
+var username = 'Player';
+
+export function saveConfig() {
+  new ConfigProvider().loadConfig().then(function(result) {
+    minRam = result.memory.min;
+    maxRam = result.memory.max;
+    username = result.account.username;
+  })
+}
+
 
 export default class LauncherProvider {
   private assetsDir: string;
@@ -21,6 +35,7 @@ export default class LauncherProvider {
     this.versionsDir = getSafeLauncherDir('versions');
   }
 
+
   instantiate(instance: Instance | null, version: Version): MinecraftLauncher {
     const mcDir = path.join(
       this.instancesDir,
@@ -30,7 +45,7 @@ export default class LauncherProvider {
 
     const launcher = new MinecraftLauncher({
       authentication: {
-        name: 'Player',
+        name: username,
       },
       gameRoot: mcDir,
       assetsRoot: this.assetsDir,
@@ -38,8 +53,8 @@ export default class LauncherProvider {
       nativesRoot: this.nativesDir,
       versionRoot: this.versionsDir,
       memory: {
-        min: 1024,
-        max: 2048,
+        min: minRam,
+        max: maxRam,
       },
       version: {
         number: version.name,

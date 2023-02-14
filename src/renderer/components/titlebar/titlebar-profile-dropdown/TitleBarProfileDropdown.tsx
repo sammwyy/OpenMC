@@ -15,7 +15,16 @@ import { BiChevronDown } from 'react-icons/bi';
 
 import styles from './TitleBarProfileDropdown.module.css';
 
+import { getConfig } from 'renderer/services/config.service';
+var usernameValue: string;
+var accountMode: string;
+const config = getConfig().then(function(result) {
+  usernameValue = (result.account.username);
+  accountMode = (result.account.mode);
+});
+
 export default function TitleBarProfileDropdown() {
+  {config}
   return (
     <Menu>
       <MenuButton
@@ -27,11 +36,11 @@ export default function TitleBarProfileDropdown() {
         <Flex alignItems="center">
           <Image
             borderRadius="50%"
-            src="https://mc-heads.net/avatar/steve/32"
+            src={"https://mc-heads.net/avatar/" + usernameValue + "/32"}
           />
           <Box textAlign="left" ml="10px">
-            <Text fontSize="14px">Player</Text>
-            <Badge colorScheme="red">Offline</Badge>
+            <Text fontSize="14px">{usernameValue}</Text>
+            <Badge colorScheme="red">{accountMode}</Badge>
           </Box>
         </Flex>
       </MenuButton>

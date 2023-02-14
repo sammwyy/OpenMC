@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
   | 'app:log'
+  | 'config:read'
+  | 'config:save'
   | 'icons:list'
   | 'instances:create'
   | 'instances:get_metadata'

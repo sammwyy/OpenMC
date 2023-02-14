@@ -16,6 +16,7 @@ import Manager from './manager';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import Logger from './logger';
+const fs = require('fs');
 
 class AppUpdater {
   constructor() {
@@ -70,6 +71,8 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minWidth: 768,
+    minHeight: 512,
     icon: getAssetPath('icon.png'),
     frame: false,
     webPreferences: {
@@ -107,6 +110,7 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
+
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

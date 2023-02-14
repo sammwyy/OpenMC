@@ -19,6 +19,7 @@ import CreateInstance from './screens/instances/create_instance';
 import theme from './theme';
 import './styles/scroll.css';
 import Logs from './screens/logs';
+import Settings from './screens/settings';
 import DownloadProvider from './contexts/download/download-provider';
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Main />} />
                   <Route path="/logs" element={<Logs />} />
+                  <Route path="/settings" element={<Settings />} />
 
                   <Route path="/instances" element={<Instances />} />
                   <Route
