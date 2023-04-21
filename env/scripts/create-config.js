@@ -14,8 +14,6 @@ function getLauncherDir() {
   return path.join(getAppdataDir(), '.openmc');
 }
 
-console.log(getLauncherDir());
-
 const config = {
   username: 'Steve',
   mode: 'offline',
