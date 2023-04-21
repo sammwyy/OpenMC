@@ -1,11 +1,14 @@
 import Instance from 'common/instances/instance';
 import Version from 'common/versions/version';
 import { IpcMain } from 'electron';
+import { readFileSync, writeFileSync } from 'jsonfile';
+import path from 'path';
 import Logger from './logger';
 import IconsProvider from './providers/icons.provider';
 import InstanceProvider from './providers/instance.provider';
 import LauncherProvider from './providers/launcher.provider';
 import VersionsProvider from './providers/versions.provider';
+import { getSafeLauncherDir } from './utils/dir.utils';
 
 export default class Manager {
   private readonly icons: IconsProvider;
@@ -64,6 +67,60 @@ export default class Manager {
       launcher.prepare();
       await launcher.start();
       event.sender.send('launcher:launch', null);
+    });
+
+    ipc.on('ram:modify', async (event, args) => {
+      // Logger.debug(`Renderer call IPC function "ram:modify"`);
+      const minValue = args[0] as number;
+      const maxValue = args[1] as number;
+
+      const configFile = path.join(getSafeLauncherDir(), 'config.json');
+
+      const values = readFileSync(configFile);
+      values.minRam = minValue;
+      values.maxRam = maxValue;
+
+      writeFileSync(configFile, values);
+    });
+
+    ipc.on('ram:read', async (event) => {
+      // Logger.debug(`Renderer call IPC function "ram:read"`);
+
+      const configFile = path.join(getSafeLauncherDir(), 'config.json');
+
+      const values = readFileSync(configFile);
+
+      const minRam: number = values.minRam;
+      const maxRam: number = values.maxRam;
+
+      event.sender.send('ram:read', [minRam, maxRam]);
+    });
+
+    ipc.on('username:modify', async (event, args) => {
+      // Logger.debug(`Renderer call IPC function "username:modify"`);
+
+      const username = args[0] as string;
+
+      const configFile = path.join(getSafeLauncherDir(), 'config.json');
+
+      const values = readFileSync(configFile);
+      values.username = username;
+
+      writeFileSync(configFile, values);
+
+      event.sender.send('username:modify');
+    });
+
+    ipc.on('username:read', async (event) => {
+      // Logger.debug(`Renderer call IPC function "username:read"`);
+
+      const configFile = path.join(getSafeLauncherDir(), 'config.json');
+
+      const values = await readFileSync(configFile);
+
+      const username: string = values.username;
+
+      event.sender.send('username:read', username);
     });
 
     ipc.on('versions:download', async (event, args) => {
