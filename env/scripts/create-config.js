@@ -17,7 +17,7 @@ function getLauncherDir() {
 console.log(getLauncherDir());
 
 const config = {
-  username: 'Player',
+  username: 'Steve',
   mode: 'offline',
   minRam: 1024,
   maxRam: 2048,
