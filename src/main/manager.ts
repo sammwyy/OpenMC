@@ -75,10 +75,10 @@ export default class Manager {
       const maxValue = args[1] as number;
 
       const configFile = path.join(getSafeLauncherDir(), 'config.json');
-
       const values = readFileSync(configFile);
-      values.minRam = minValue;
-      values.maxRam = maxValue;
+      
+      values.minRam = minValue >= 1024 ? minValue : 1024;
+      values.maxRam = maxValue >= 2048 ? maxValue : 2048;
 
       writeFileSync(configFile, values);
     });
@@ -87,11 +87,10 @@ export default class Manager {
       // Logger.debug(`Renderer call IPC function "ram:read"`);
 
       const configFile = path.join(getSafeLauncherDir(), 'config.json');
-
       const values = readFileSync(configFile);
 
-      const minRam: number = values.minRam;
-      const maxRam: number = values.maxRam;
+      const minRam: number = values.minRam >= 1024 ? values.minRam : 1024;
+      const maxRam: number = values.maxRam >= 2048 ? values.maxRam : 2048;
 
       event.sender.send('ram:read', [minRam, maxRam]);
     });
@@ -102,9 +101,9 @@ export default class Manager {
       const username = args[0] as string;
 
       const configFile = path.join(getSafeLauncherDir(), 'config.json');
-
       const values = readFileSync(configFile);
-      values.username = username;
+
+      values.username = username.length >= 3 ? username : "Steve";
 
       writeFileSync(configFile, values);
 
@@ -117,8 +116,7 @@ export default class Manager {
       const configFile = path.join(getSafeLauncherDir(), 'config.json');
 
       const values = await readFileSync(configFile);
-
-      const username: string = values.username;
+      const username: string = values.username.length >= 3 ? values.username : "Steve";
 
       event.sender.send('username:read', username);
     });

@@ -1,4 +1,4 @@
-const jsonfile = require('jsonfile');
+const fs = require('node:fs');
 const path = require('path');
 
 function getAppdataDir() {
@@ -23,4 +23,4 @@ const config = {
 
 const configDir = path.join(getLauncherDir(), 'config.json');
 
-jsonfile.writeFileSync(configDir, config);
+fs.writeFileSync(configDir, JSON.stringify(config));
