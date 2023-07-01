@@ -14,6 +14,7 @@ import Main from './screens/main';
 
 import Instances from './screens/instances/instances';
 import CreateInstance from './screens/instances/create_instance';
+import Settings from './screens/settings';
 
 // Theming
 import theme from './theme';
@@ -41,6 +42,8 @@ export default function App() {
                     path="/instances/create"
                     element={<CreateInstance />}
                   />
+
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
 
                 <DownloadBar />
