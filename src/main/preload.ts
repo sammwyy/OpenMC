@@ -13,6 +13,8 @@ export type Channels =
   | 'versions:download_end'
   | 'versions:download_manifest'
   | 'versions:list'
+  | 'settings:load'
+  | 'settings:save'
   | 'window:close'
   | 'window:minimize'
   | 'window:maximize';

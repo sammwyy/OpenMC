@@ -1,22 +1,26 @@
 import Instance from 'common/instances/instance';
+import Settings from 'common/settings';
 import Version from 'common/versions/version';
 import { IpcMain } from 'electron';
 import Logger from './logger';
 import IconsProvider from './providers/icons.provider';
 import InstanceProvider from './providers/instance.provider';
 import LauncherProvider from './providers/launcher.provider';
+import SettingsProvider from './providers/settings.provider';
 import VersionsProvider from './providers/versions.provider';
 
 export default class Manager {
   private readonly icons: IconsProvider;
   private readonly instances: InstanceProvider;
   private readonly launcher: LauncherProvider;
+  private readonly settings: SettingsProvider;
   private readonly versions: VersionsProvider;
 
   constructor() {
     this.icons = new IconsProvider();
     this.instances = new InstanceProvider();
     this.launcher = new LauncherProvider();
+    this.settings = new SettingsProvider();
     this.versions = new VersionsProvider(this.launcher);
   }
 
@@ -64,6 +68,19 @@ export default class Manager {
       launcher.prepare();
       await launcher.start();
       event.sender.send('launcher:launch', null);
+    });
+
+    ipc.on('settings:load', async (event) => {
+      Logger.debug(`Renderer call IPC function "settings:load"`);
+      const loadedSettings = await this.settings.loadConfig();
+      event.sender.send('settings:load', loadedSettings);
+    });
+
+    ipc.on('settings:save', async (event, args) => {
+      Logger.debug(`Renderer call IPC function "settings:save"`);
+      const toSave = args[0] as Settings;
+      await this.settings.saveConfig(toSave);
+      event.sender.send('settings:save', toSave);
     });
 
     ipc.on('versions:download', async (event, args) => {
